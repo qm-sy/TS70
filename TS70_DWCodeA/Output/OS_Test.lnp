@@ -1,0 +1,12 @@
+"..\Output\main.obj",
+"..\Output\STARTUP_M5.obj",
+"..\Output\tim.obj",
+"..\Output\uart.obj",
+"..\Output\gpio.obj",
+"..\Output\communication.obj",
+"..\Output\sys.obj",
+"..\Output\gui_ctrl.obj",
+"..\Output\modbus.obj" 
+TO "..\Output\OS_Test" 
+PRINT(".\Listings\OS_Test.m51") RAMSIZE(256) 
+XDATA( 0X8000-0XFFFF )

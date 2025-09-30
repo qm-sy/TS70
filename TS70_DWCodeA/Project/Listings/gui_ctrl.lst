@@ -1,0 +1,234 @@
+C51 COMPILER V9.60.7.0   GUI_CTRL                                                          09/30/2025 15:47:46 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE GUI_CTRL
+OBJECT MODULE PLACED IN ..\Output\gui_ctrl.obj
+COMPILER INVOKED BY: D:\APP\KEIL\MDK\C51\BIN\C51.EXE ..\Emembed\Src\gui_ctrl.c LARGE OPTIMIZE(8,SPEED) BROWSE INCDIR(..\
+                    -BSP\Inc;..\Core\Inc;..\Driver;..\SYSTEM;..\Emembed\Inc) DEBUG OBJECTEXTEND PRINT(.\Listings\gui_ctrl.lst) TABS(2) OBJECT
+                    -(..\Output\gui_ctrl.obj)
+
+line level    source
+
+   1          #include "gui_ctrl.h"
+   2          
+   3          SP350 sp350;
+   4          HANSEN hansen;
+   5          
+   6          void sp350_parms_init( void )
+   7          {
+   8   1          sp350.alarm_tempF = 50;         
+   9   1          sp350.alarm_tempM = 55;         
+  10   1          sp350.alarm_tempR = 60;         
+  11   1          sp350.F_switch    = 1;          
+  12   1          sp350.M_switch    = 1;          
+  13   1          sp350.R_switch    = 1;          
+  14   1          sp350.LED_switch  = 1;          
+  15   1          sp350.fan_switch  = 1;         
+  16   1          sp350.fan_level   = 1;
+  17   1      
+  18   1          sys_write_vp(0x2010,(uint8_t*)&sp350.alarm_tempF,1);
+  19   1          sys_write_vp(0x2011,(uint8_t*)&sp350.alarm_tempM,1);
+  20   1          sys_write_vp(0x2012,(uint8_t*)&sp350.alarm_tempR,1);
+  21   1      
+  22   1          sys_write_vp(0x2013,(uint8_t*)&sp350.F_switch,1);
+  23   1          sys_write_vp(0x2014,(uint8_t*)&sp350.M_switch,1);
+  24   1          sys_write_vp(0x2015,(uint8_t*)&sp350.R_switch,1);
+  25   1      
+  26   1          sys_write_vp(0x2016,(uint8_t*)&sp350.LED_switch,1);
+  27   1      
+  28   1          sys_write_vp(0x2017,(uint8_t*)&sp350.fan_switch,1);
+  29   1          sys_write_vp(0x201a,(uint8_t*)&sp350.fan_level,1);
+  30   1      }
+  31          
+  32          void diwen_parms_init( void )
+  33          {
+  34   1          hansen.addr_0x00 = 0x00;
+  35   1          hansen.addr_0x02 = 0x00;
+  36   1          hansen.addr_0x06 = 0x1949;
+  37   1          hansen.addr_0x20 = 0x00;
+  38   1          hansen.addr_0x21 = 0x00;
+  39   1          hansen.addr_0x22 = 0x00;
+  40   1          hansen.addr_0x23 = 0x0f;
+  41   1          hansen.addr_0x2d = 0x00;
+  42   1          hansen.addr_0x30 = 0x00;
+  43   1      
+  44   1          hansen.addr_0x20_02 = hansen.addr_0x06 & 0x03;
+  45   1          hansen.addr_0x20_35 = (hansen.addr_0x06 & 0x38) >> 3;
+  46   1          hansen.addr_0x20_67 = (hansen.addr_0x06 & 0xc0) >> 6;
+  47   1          hansen.addr_0x20_8a = (hansen.addr_0x06 & 0x0700) >> 8;
+  48   1          hansen.addr_0x20_bc = (hansen.addr_0x06 & 0x1800) >> 11;
+  49   1      
+  50   1          sys_write_vp(0x2051,(uint8_t*)&(hansen.addr_0x20_02),1);
+  51   1          sys_write_vp(0x2052,(uint8_t*)&(hansen.addr_0x20_35),1);
+  52   1          sys_write_vp(0x2053,(uint8_t*)&(hansen.addr_0x20_67),1);
+  53   1          sys_write_vp(0x2054,(uint8_t*)&(hansen.addr_0x20_8a),1);    
+C51 COMPILER V9.60.7.0   GUI_CTRL                                                          09/30/2025 15:47:46 PAGE 2   
+
+  54   1          sys_write_vp(0x2055,(uint8_t*)&(hansen.addr_0x20_bc),1);
+  55   1      
+  56   1      
+  57   1          sys_write_vp(0x2020,(uint8_t*)&hansen.addr_0x20,1);
+  58   1          sys_write_vp(0x2021,(uint8_t*)&hansen.addr_0x21,1);
+  59   1          sys_write_vp(0x2022,(uint8_t*)&hansen.addr_0x22,1);
+  60   1          sys_write_vp(0x2023,(uint8_t*)&hansen.addr_0x23,1);
+  61   1      
+  62   1          sys_write_vp(0x2060,(uint8_t*)&hansen.addr_0x00,1);
+  63   1          sys_write_vp(0x2062,(uint8_t*)&hansen.addr_0x02,1);
+  64   1      }
+  65          
+  66          void gui_vol_ctrl( uint16_t addr, uint8_t val_H, uint8_t val_L)
+  67          {
+  68   1          uint8_t val_tab[2] = {0};
+  69   1      
+  70   1          switch ( addr )
+  71   1          {   
+  72   2              /*      0x20 马达复位：置1后开始复位，等待被置0        */
+  73   2              /*      0x20 跑机操作：置1后开始复位，等待被置0        */
+  74   2              /*      0x20 点动操作：置1一直移动，写0后停止移动      */
+  75   2              /*      0x20 bit0  x马达复位     */
+  76   2              /*      0x20 bit3  左移          */
+  77   2              /*      0x20 bit4  右移          */
+  78   2              /*      0x20 bit5  进料          */
+  79   2              /*      0x20 bit6  退料          */
+  80   2              /*      0x20 bit9  开始跑机      */
+  81   2              /*      0x20 bit13  停止跑机     */
+  82   2              case 0x2020:
+  83   2                  hansen.addr_0x20 = (val_H << 8) |  val_L;
+  84   2                  
+  85   2                  break;
+  86   2      
+  87   2              case 0x2021:
+  88   2                  hansen.addr_0x21 = (val_H << 8) |  val_L;
+  89   2                  
+  90   2                  break;
+  91   2      
+  92   2              case 0x2022:
+  93   2                  hansen.addr_0x22 = (val_H << 8) |  val_L;
+  94   2                  
+  95   2                  break;   
+  96   2      
+  97   2              case 0x2023:
+  98   2                  hansen.addr_0x23 = (val_H << 8) |  val_L;
+  99   2                  
+ 100   2                  break;
+ 101   2      
+ 102   2              case 0x2051:
+ 103   2                  hansen.addr_0x06 |= ((val_H << 8) |  val_L & 0x03);
+ 104   2                  
+ 105   2                  break;
+ 106   2      
+ 107   2              case 0x2052:
+ 108   2                  hansen.addr_0x06 |= ((val_H << 8) |  val_L & 0x38);
+ 109   2                  
+ 110   2                  break;
+ 111   2      
+ 112   2              case 0x2053:
+ 113   2                  hansen.addr_0x06 |= ((val_H << 8) |  val_L & 0xC0);
+ 114   2                  
+ 115   2                  break;
+C51 COMPILER V9.60.7.0   GUI_CTRL                                                          09/30/2025 15:47:46 PAGE 3   
+
+ 116   2      
+ 117   2              case 0x2054:
+ 118   2                  hansen.addr_0x06 |= ((val_H << 8) |  val_L & 0x0700);
+ 119   2                  
+ 120   2                  break;
+ 121   2      
+ 122   2              case 0x2055:
+ 123   2                  hansen.addr_0x06 |= ((val_H << 8) |  val_L & 0x1800);
+ 124   2                  
+ 125   2                  break;
+ 126   2      
+ 127   2              case 0x2060:
+ 128   2                  hansen.addr_0x00 = (val_H << 8) |  val_L;
+ 129   2                  
+ 130   2                  break;
+ 131   2      
+ 132   2              case 0x2062:
+ 133   2                  hansen.addr_0x02 = (val_H << 8) |  val_L;
+ 134   2                  
+ 135   2                  break;
+ 136   2      
+ 137   2              case 0x2033:
+ 138   2                  Write_Dgusii_Vp_byChar(0x1600,"乔铭",4);
+ 139   2                  
+ 140   2                  break;
+ 141   2              /*          40001 设置alarm_tempF(val_L) alarm_tempM(val_H)          */
+ 142   2              case 0x2010:
+ 143   2                  sp350.alarm_tempF = val_L;
+ 144   2                  write_slave_06(UART_5,ALARM_TEMP12_ADDR,(uint8_t)sp350.alarm_tempM,(uint8_t)sp350.alarm_tempF)
+             -;  
+ 145   2      
+ 146   2                  break;
+ 147   2              
+ 148   2              case 0x2011:
+ 149   2                  sp350.alarm_tempM = val_L;
+ 150   2                  write_slave_06(UART_5,ALARM_TEMP12_ADDR,(uint8_t)sp350.alarm_tempM,(uint8_t)sp350.alarm_tempF)
+             -;   
+ 151   2      
+ 152   2                  break;
+ 153   2      
+ 154   2              case 0x2012:
+ 155   2                  sp350.alarm_tempR = val_L;
+ 156   2                  write_slave_06(UART_5,ALARM_TEMP3_ADDR,0,(uint8_t)sp350.alarm_tempR);  
+ 157   2                  
+ 158   2                  break;
+ 159   2      
+ 160   2               
+ 161   2              /*          40002 设置 F\M\R  Switch                                 */
+ 162   2              case 0x2013:
+ 163   2                  sp350.F_switch = val_L;
+ 164   2                  write_slave_06(UART_5,FM_SWITCH_ADDR,(uint8_t)sp350.M_switch,(uint8_t)sp350.F_switch);  
+ 165   2      
+ 166   2                  break;
+ 167   2              
+ 168   2              case 0x2014:
+ 169   2                  sp350.M_switch = val_L;
+ 170   2                  write_slave_06(UART_5,FM_SWITCH_ADDR,(uint8_t)sp350.M_switch,(uint8_t)sp350.F_switch); 
+ 171   2      
+ 172   2                  break;
+ 173   2      
+ 174   2              case 0x2015:
+ 175   2                  sp350.R_switch = val_L;
+C51 COMPILER V9.60.7.0   GUI_CTRL                                                          09/30/2025 15:47:46 PAGE 4   
+
+ 176   2                  write_slave_06(UART_5,R_SWITCH_ADDR,0,(uint8_t)sp350.R_switch); 
+ 177   2      
+ 178   2                  break;
+ 179   2      
+ 180   2              case 0x2016:
+ 181   2                  sp350.LED_switch = val_L;
+ 182   2                  write_slave_06(UART_5,LED_SWITCH_ADDR,0,(uint8_t)sp350.LED_switch); 
+ 183   2      
+ 184   2                  break;
+ 185   2      
+ 186   2              case 0x2017:
+ 187   2                  sp350.fan_switch = val_L;
+ 188   2                  write_slave_06(UART_5,LED_SWITCH_ADDR,(uint8_t)sp350.fan_switch,(uint8_t)sp350.fan_level); 
+ 189   2      
+ 190   2                  break; 
+ 191   2      
+ 192   2              case 0x3018:
+ 193   2                  sp350.fan_level = val_L;
+ 194   2                  write_slave_06(UART_5,FAN_ADDR,(uint8_t)sp350.fan_switch,(uint8_t)sp350.fan_level); 
+ 195   2      
+ 196   2                  break; 
+ 197   2      
+ 198   2              default:
+ 199   2                  break;
+ 200   2          }
+ 201   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   1186    ----
+   CONSTANT SIZE    =      7    ----
+   XDATA SIZE       =     46       6
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
