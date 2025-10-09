@@ -2,8 +2,9 @@
 #define __SYS_H__
 
 #include "t5los8051.h"
-#include <STDIO.H>
-#include <string.h>
+#include "string.h"
+#include "stdio.h"
+
 
 typedef unsigned char   uint8_t;
 typedef unsigned short  uint16_t;

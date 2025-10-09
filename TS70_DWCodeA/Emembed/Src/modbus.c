@@ -105,11 +105,9 @@ void Modbus_Event_Uart5( void )
 
                     case FUN_06:        Modbus_Fun06();         break; 
                         
+                    case FUN_16:        Modbus_Fun16();         break;  
 
-                    case FUN_16:                                break;  
-
-                    default:
-                        break;
+                    default:                                    break;
                 }
             }
         }
@@ -252,23 +250,23 @@ void Modbus_Fun06( void )
 
             break;
 
-        /*                    */
-        case 0x100:   
-            //hansen.addr_0x2 = (rs485_5.RX_buf[4] << 8) | rs485_5.RX_buf[5]; 
+        // /*                    */
+        // case 0x100:   
+        //     //hansen.addr_0x2 = (rs485_5.RX_buf[4] << 8) | rs485_5.RX_buf[5]; 
 
-            break;
+        //     break;
 
-        /*                    */
-        case 0x101:    
-            //hansen.addr_0x24 = (rs485_5.RX_buf[4] << 8) | rs485_5.RX_buf[5]; 
+        // /*                    */
+        // case 0x101:    
+        //     //hansen.addr_0x24 = (rs485_5.RX_buf[4] << 8) | rs485_5.RX_buf[5]; 
 
-            break;
+        //     break;
  
-        /*                    */
-        case 0x102:   
-            //hansen.addr_0x25 = (rs485_5.RX_buf[4] << 8) | rs485_5.RX_buf[5]; 
+        // /*                    */
+        // case 0x102:   
+        //     //hansen.addr_0x25 = (rs485_5.RX_buf[4] << 8) | rs485_5.RX_buf[5]; 
 
-            break;
+        //     break;
 
         default:
             break;   
@@ -278,10 +276,78 @@ void Modbus_Fun06( void )
 
 }
 
+/**
+ * @brief	写多个输出寄存器  16
+ *
+ * @param   void
+ *
+ * @return  void 
+**/
 void Modbus_Fun16( void )
 {
-   
+    uint16_t i;
+
+    modbus5.rcv_value_addr = 7;                  //DATA1 H位置
+    modbus5.byte_cnt   = rs485_5.RX_buf[6];
+    modbus5.start_addr = rs485_5.RX_buf[2]<<8 | rs485_5.RX_buf[3];
+
+    for( i = modbus5.start_addr; i < modbus5.start_addr + modbus5.byte_cnt/2; i++)
+    {
+        modbus5.byte_info_H = rs485_5.RX_buf[modbus5.rcv_value_addr];
+        modbus5.byte_info_L = rs485_5.RX_buf[modbus5.rcv_value_addr + 1];
+        switch (i)
+        {
+            /*  40001  24V LED开关状态设置                  */
+            case 0:
+
+
+                break;
+            
+            /*  40002  两路PWM 开关状态及风速设置           */
+            case 1:
+
+
+                break;
+
+            /*  40003  220V 开关设置                        */
+            case 2:
+
+                break;
+
+            /*  40004  烘干功率及风扇档位 设置              */
+            case 3:
+
+
+                break;
+
+            /*  40005  NTC1 NTC2 alarm value 设置           */
+            case 4:
+
+
+                break;
+            
+            /*  40006  NTC3 alarm value 设置                */
+            case 5:
+
+
+                break;
+
+            /*  40007  同步开关设置                         */
+            case 6:
+
+
+                break;
+
+            default:
+                break;
+        }
+        modbus5.rcv_value_addr += 2;         //从Value1_H →→ 从Value2_H
+    }
+    
+    slave_to_master(0x10,8);  
+
 }
+
 /**
  * @brief	写单个输出寄存器-06
  *
@@ -362,8 +428,15 @@ void slave_to_master(uint8_t code_num,uint8_t length)
             break;    
 
         case 0x06:
-            memcpy(rs485_5.TX_buf,rs485_5.RX_buf,8);
-
+            // memcpy(rs485_5.TX_buf,rs485_5.RX_buf,8);
+            rs485_5.TX_buf[0] = 1;
+            rs485_5.TX_buf[1] = 1;
+            rs485_5.TX_buf[2] = 1;
+            rs485_5.TX_buf[3] = 1;
+            rs485_5.TX_buf[4] = 1;
+            rs485_5.TX_buf[5] = 1;
+            rs485_5.TX_buf[6] = 1;
+            rs485_5.TX_buf[7] = 1;
             rs485_5.TX_send_bytelength = length;
             
             break;    
