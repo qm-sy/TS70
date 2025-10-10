@@ -83,20 +83,14 @@ void Modbus_Event_Uart5( void )
     /*1.接收完毕                                           */
     if( rs485_5.RX_rcv_end_Flag == 1 )
     {
-        /*2.清空接收完毕标志位                              */    
-        rs485_5.RX_rcv_end_Flag = 0;
-
-        /*3.CRC校验                                         */
+        /*2.CRC校验                                         */
         crc = MODBUS_CRC16(rs485_5.RX_buf, rs485_5.RX_rcv_cnt-2);
         rccrc = (rs485_5.RX_buf[rs485_5.RX_rcv_cnt - 2]) | (rs485_5.RX_buf[rs485_5.RX_rcv_cnt - 1] << 8);
 
-        /*4.清空接收计数                                    */
-        rs485_5.RX_rcv_cnt = 0; 
-
-        /*5.CRC校验通过，进行地址域校验                      */
+        /*3.CRC校验通过，进行地址域校验                      */
         if( crc == rccrc )
         {
-            /*6.地址域校验通过，进入相应功能函数进行处理      */
+            /*4.地址域校验通过，进入相应功能函数进行处理      */
             if( rs485_5.RX_buf[0] == 0x01 )
             {
                 switch ( rs485_5.RX_buf[1] )
@@ -111,6 +105,10 @@ void Modbus_Event_Uart5( void )
                 }
             }
         }
+        /*5.清空接收计数                                    */
+        rs485_5.RX_rcv_cnt = 0; 
+        /*6.清空接收完毕标志位                              */    
+        rs485_5.RX_rcv_end_Flag = 0;
     }
 }
 
@@ -272,7 +270,7 @@ void Modbus_Fun06( void )
             break;   
     }
 
-    slave_to_master(0x06,8);
+    slave_to_master(FUN_06,8);
 
 }
 
@@ -344,7 +342,7 @@ void Modbus_Fun16( void )
         modbus5.rcv_value_addr += 2;         //从Value1_H →→ 从Value2_H
     }
     
-    slave_to_master(0x10,8);  
+    slave_to_master(FUN_16,8);  
 
 }
 
@@ -398,11 +396,11 @@ void write_slave_06( uint8_t uart_num, uint16_t reg_addr, uint8_t reg_val_H, uin
  * 
   @return  crc16:crc校验的值 2byte
  */
-void slave_to_master(uint8_t code_num,uint8_t length)
+void slave_to_master(uint8_t code_num, uint8_t length)
 {
     uint16_t crc;
 
-    switch (code_num)
+    switch(code_num)
     {
         case 0x03:
             crc = MODBUS_CRC16(rs485_5.TX_buf,length);
@@ -428,15 +426,7 @@ void slave_to_master(uint8_t code_num,uint8_t length)
             break;    
 
         case 0x06:
-            // memcpy(rs485_5.TX_buf,rs485_5.RX_buf,8);
-            rs485_5.TX_buf[0] = 1;
-            rs485_5.TX_buf[1] = 1;
-            rs485_5.TX_buf[2] = 1;
-            rs485_5.TX_buf[3] = 1;
-            rs485_5.TX_buf[4] = 1;
-            rs485_5.TX_buf[5] = 1;
-            rs485_5.TX_buf[6] = 1;
-            rs485_5.TX_buf[7] = 1;
+            memcpy(rs485_5.TX_buf,rs485_5.RX_buf,length);
             rs485_5.TX_send_bytelength = length;
             
             break;    

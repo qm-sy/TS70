@@ -58,6 +58,7 @@ void diwen_parms_init( void )
     sys_write_vp(0x2021,(uint8_t*)&hansen.addr_0x21,1);
     sys_write_vp(0x2022,(uint8_t*)&hansen.addr_0x22,1);
     sys_write_vp(0x2023,(uint8_t*)&hansen.addr_0x23,1);
+    sys_write_vp(0x2030,(uint8_t*)&hansen.addr_0x30,0);
 
     sys_write_vp(0x2060,(uint8_t*)&hansen.addr_0x00,1);
     sys_write_vp(0x2062,(uint8_t*)&hansen.addr_0x02,1);
@@ -96,6 +97,11 @@ void gui_vol_ctrl( uint16_t addr, uint8_t val_H, uint8_t val_L)
 
         case 0x2023:
             hansen.addr_0x23 = (val_H << 8) |  val_L;
+            
+            break;
+
+        case 0x2030:
+            hansen.addr_0x30 = (val_H << 8) |  val_L;
             
             break;
 
