@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.7.0   SYS                                                               10/10/2025 10:08:56 PAGE 1   
+C51 COMPILER V9.60.7.0   SYS                                                               10/15/2025 21:46:45 PAGE 1   
 
 
 C51 COMPILER V9.60.7.0, COMPILATION OF MODULE SYS
@@ -62,7 +62,7 @@ line level    source
   51          // //软件大致延时,单位ms
   52          // //如果修改了优化等级,那么此函数内部的参数需要重新调试
   53          // void sys_delay_about_ms(uint16_t ms)
-C51 COMPILER V9.60.7.0   SYS                                                               10/10/2025 10:08:56 PAGE 2   
+C51 COMPILER V9.60.7.0   SYS                                                               10/15/2025 21:46:45 PAGE 2   
 
   54          // {
   55          //  uint16_t i,j;
@@ -126,7 +126,7 @@ line level    source
  113   1        RAMMODE = 0x8F;   //写操作
  114   1        while(!APP_ACK);
  115   1        if(Dgus_Addr%2){DATA1=(uint8_t)(Val>>8); DATA0=(uint8_t)(Val); }
-C51 COMPILER V9.60.7.0   SYS                                                               10/10/2025 10:08:56 PAGE 3   
+C51 COMPILER V9.60.7.0   SYS                                                               10/15/2025 21:46:45 PAGE 3   
 
  116   1        else { DATA3 =(uint8_t)(Val>>8);  DATA2 =(uint8_t)(Val);}
  117   1        APP_EN = 1;
@@ -190,7 +190,7 @@ line level    source
  175   1        RAMMODE = 0x8F;
  176   1        while(APP_ACK==0);
  177   1        if(i && len>0)
-C51 COMPILER V9.60.7.0   SYS                                                               10/10/2025 10:08:56 PAGE 4   
+C51 COMPILER V9.60.7.0   SYS                                                               10/15/2025 21:46:45 PAGE 4   
 
  178   1        { 
  179   2          RAMMODE = 0x83; 
@@ -254,7 +254,7 @@ line level    source
  237   1        while(len >= 4){
  238   2          DATA3 = *buf++;
  239   2          DATA2 = *buf++;
-C51 COMPILER V9.60.7.0   SYS                                                               10/10/2025 10:08:56 PAGE 5   
+C51 COMPILER V9.60.7.0   SYS                                                               10/15/2025 21:46:45 PAGE 5   
 
  240   2          DATA1 = *buf++;
  241   2          DATA0 = *buf++;

@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.7.0   COMMUNICATION                                                     10/10/2025 10:08:56 PAGE 1   
+C51 COMPILER V9.60.7.0   COMMUNICATION                                                     10/15/2025 21:46:45 PAGE 1   
 
 
 C51 COMPILER V9.60.7.0, COMPILATION OF MODULE COMMUNICATION
@@ -62,11 +62,11 @@ line level    source
   51          **/
   52          void Uart5_Send_Statu_Init( void )
   53          {
-C51 COMPILER V9.60.7.0   COMMUNICATION                                                     10/10/2025 10:08:56 PAGE 2   
+C51 COMPILER V9.60.7.0   COMMUNICATION                                                     10/15/2025 21:46:45 PAGE 2   
 
   54   1          rs485_5.RX_rcv_end_Flag = 0;
-  55   1          rs485_5.TX_buf[240] = 0;
-  56   1          rs485_5.RX_buf[240] = 0;
+  55   1          rs485_5.TX_buf[1024] = 0;
+  56   1          rs485_5.RX_buf[1024] = 0;
   57   1          rs485_5.TX_send_bytelength = 0;
   58   1          rs485_5.TX_send_cnt = 0;
   59   1          rs485_5.RX_rcv_timeout = 0;
@@ -126,7 +126,7 @@ line level    source
  113   3                  if( rs485_2.RX2_rev_cnt > 128 )
  114   3                  {
  115   4                      rs485_2.RX2_rev_cnt = 0;
-C51 COMPILER V9.60.7.0   COMMUNICATION                                                     10/10/2025 10:08:56 PAGE 3   
+C51 COMPILER V9.60.7.0   COMMUNICATION                                                     10/15/2025 21:46:45 PAGE 3   
 
  116   4                  }
  117   3      
@@ -190,7 +190,7 @@ line level    source
  175          //             if( rs485_4.RX4_rev_cnt > 128 )
  176          //             {
  177          //                 rs485_4.RX4_rev_cnt = 0;
-C51 COMPILER V9.60.7.0   COMMUNICATION                                                     10/10/2025 10:08:56 PAGE 4   
+C51 COMPILER V9.60.7.0   COMMUNICATION                                                     10/15/2025 21:46:45 PAGE 4   
 
  178          //             }
  179          
@@ -250,11 +250,11 @@ line level    source
  233   2              if( !rs485_5.RX_rcv_end_Flag )
  234   2              {
  235   3                  /* 4, 数据包大于RX_buf 则从头计数                  */
- 236   3                  if( rs485_5.RX_rcv_cnt > 240 )
+ 236   3                  if( rs485_5.RX_rcv_cnt > 1024 )
  237   3                  {
  238   4                      rs485_5.RX_rcv_cnt = 0;
  239   4                  }
-C51 COMPILER V9.60.7.0   COMMUNICATION                                                     10/10/2025 10:08:56 PAGE 5   
+C51 COMPILER V9.60.7.0   COMMUNICATION                                                     10/15/2025 21:46:45 PAGE 5   
 
  240   3      
  241   3                  /* 5, 依次将RX_buf中数据接收（读S2BUF操作即为接收）*/
@@ -318,7 +318,7 @@ line level    source
  299   1      }
  300          
  301          
-C51 COMPILER V9.60.7.0   COMMUNICATION                                                     10/10/2025 10:08:56 PAGE 6   
+C51 COMPILER V9.60.7.0   COMMUNICATION                                                     10/15/2025 21:46:45 PAGE 6   
 
  302          void uart4_send_byte( uint8_t byte )
  303          {
@@ -347,9 +347,9 @@ line level    source
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =    608    ----
+   CODE SIZE        =    642    ----
    CONSTANT SIZE    =   ----    ----
-   XDATA SIZE       =   1013       5
+   XDATA SIZE       =   2582       5
    PDATA SIZE       =   ----    ----
    DATA SIZE        =   ----    ----
    IDATA SIZE       =   ----    ----

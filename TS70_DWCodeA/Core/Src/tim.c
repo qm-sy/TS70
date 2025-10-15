@@ -31,6 +31,7 @@ void Tim1_Init( void )      //1ms
 void Tim0_Isr( void ) interrupt 1
 {
     static uint8_t press_scan_cnt = 0;
+    static uint16_t paoji_cnt = 0;
 
     TH0   = (uint8_t)(T0_PERIOD_1MS>>8);
     TL0   = (uint8_t)T0_PERIOD_1MS;      
@@ -48,6 +49,32 @@ void Tim0_Isr( void ) interrupt 1
             press_scan_cnt = 0;
             gui_scan_flag = 1;
         }
+    }
+
+    if( hansen.paoji_flag  == 1 )
+    {
+        paoji_cnt++;
+        if( paoji_cnt == 1000 )
+        {
+            paoji_cnt = 0;
+            hansen.paoji_s++;
+            if( hansen.paoji_s == 60 )
+            {
+                hansen.paoji_s = 0;
+                hansen.paoji_min++;
+                if( hansen.paoji_min == 60 )
+                {
+                    hansen.paoji_min = 0;
+                    hansen.paoji_h++;
+                }
+            }
+            hansen.paoji_send = 1;
+        }
+    }else
+    {
+        hansen.paoji_send = 0;
+        hansen.paoji_h = hansen.paoji_min = hansen.paoji_s = 0;
+        paoji_cnt = 0;
     }
 }
 

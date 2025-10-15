@@ -2,6 +2,7 @@
 
 SP350 sp350;
 HANSEN hansen;
+DAYIN_T dayin_t;
 
 void sp350_parms_init( void )
 {
@@ -31,42 +32,30 @@ void sp350_parms_init( void )
 
 void diwen_parms_init( void )
 {
+    hansen.ctrl_flag = 0;
+    hansen.connect_flag = 0;
     hansen.addr_0x00 = 0x00;
     hansen.addr_0x02 = 0x00;
-    hansen.addr_0x06 = 0x1949;
+    hansen.addr_0x06 = 0x0149;
+    hansen.addr_0x10 = 0x1f;
     hansen.addr_0x20 = 0x00;
     hansen.addr_0x21 = 0x00;
     hansen.addr_0x22 = 0x00;
-    hansen.addr_0x23 = 0x0f;
+    hansen.addr_0x23 = 0x00;
     hansen.addr_0x2d = 0x00;
     hansen.addr_0x30 = 0x00;
+    hansen.addr_0x0c = 0x01;
 
-    hansen.addr_0x20_02 = hansen.addr_0x06 & 0x03;
-    hansen.addr_0x20_35 = (hansen.addr_0x06 & 0x38) >> 3;
-    hansen.addr_0x20_67 = (hansen.addr_0x06 & 0xc0) >> 6;
-    hansen.addr_0x20_8a = (hansen.addr_0x06 & 0x0700) >> 8;
-    hansen.addr_0x20_bc = (hansen.addr_0x06 & 0x1800) >> 11;
-
-    sys_write_vp(0x2051,(uint8_t*)&(hansen.addr_0x20_02),1);
-    sys_write_vp(0x2052,(uint8_t*)&(hansen.addr_0x20_35),1);
-    sys_write_vp(0x2053,(uint8_t*)&(hansen.addr_0x20_67),1);
-    sys_write_vp(0x2054,(uint8_t*)&(hansen.addr_0x20_8a),1);    
-    sys_write_vp(0x2055,(uint8_t*)&(hansen.addr_0x20_bc),1);
-
-
-    sys_write_vp(0x2020,(uint8_t*)&hansen.addr_0x20,1);
-    sys_write_vp(0x2021,(uint8_t*)&hansen.addr_0x21,1);
-    sys_write_vp(0x2022,(uint8_t*)&hansen.addr_0x22,1);
-    sys_write_vp(0x2023,(uint8_t*)&hansen.addr_0x23,1);
-    sys_write_vp(0x2030,(uint8_t*)&hansen.addr_0x30,0);
-
-    sys_write_vp(0x2060,(uint8_t*)&hansen.addr_0x00,1);
-    sys_write_vp(0x2062,(uint8_t*)&hansen.addr_0x02,1);
+    hansen.paoji_flag = hansen.paoji_send = 0;
+    hansen.paoji_h = hansen.paoji_min = hansen.paoji_s = 0;
 }
 
 void gui_vol_ctrl( uint16_t addr, uint8_t val_H, uint8_t val_L)
 {
     uint8_t val_tab[2] = {0};
+    uint8_t utf_tab[4] = {0XBA,0XDA,0XD4,0XB2};
+    uint8_t i = 0;
+    static uint8_t addr_20a0 = 0;
 
     switch ( addr )
     {   
@@ -106,27 +95,63 @@ void gui_vol_ctrl( uint16_t addr, uint8_t val_H, uint8_t val_L)
             break;
 
         case 0x2051:
-            hansen.addr_0x06 |= ((val_H << 8) |  val_L & 0x03);
+            hansen.addr_0x06 &= ~0x07;
+            switch (val_L)
+            {
+                case 1: hansen.addr_0x06 |= 0x01;       break;
+                case 2: hansen.addr_0x06 |= 0x02;       break;
+                case 3: hansen.addr_0x06 |= 0x04;       break;
+                default:                                break;
+            }
             
             break;
 
         case 0x2052:
-            hansen.addr_0x06 |= ((val_H << 8) |  val_L & 0x38);
+            hansen.addr_0x06 &= ~0x38;
+            switch (val_L)
+            {
+                case 1: hansen.addr_0x06 |= 0x08;       break;
+                case 2: hansen.addr_0x06 |= 0x10;       break;
+                case 3: hansen.addr_0x06 |= 0x20;       break;
+                default:                                break;
+            }
             
             break;
 
         case 0x2053:
-            hansen.addr_0x06 |= ((val_H << 8) |  val_L & 0xC0);
+            hansen.addr_0x06 &= ~0xC0;
+            switch (val_L)
+            {
+                case 1: hansen.addr_0x06 |= 0x40;       break;
+                case 2: hansen.addr_0x06 |= 0x80;       break;
+                case 3: hansen.addr_0x06 |= 0xc0;       break;
+                default:                                break;
+            }
             
             break;
 
         case 0x2054:
-            hansen.addr_0x06 |= ((val_H << 8) |  val_L & 0x0700);
+            hansen.addr_0x06 &= ~0x0700;
+            switch (val_L)
+            {
+                case 1: hansen.addr_0x06 |= 0x0100;     break;
+                case 2: hansen.addr_0x06 |= 0x0200;     break;
+                case 3: hansen.addr_0x06 |= 0x0400;     break;
+                default:                                break;
+            }
             
             break;
 
         case 0x2055:
-            hansen.addr_0x06 |= ((val_H << 8) |  val_L & 0x1800);
+            hansen.addr_0x06 &= ~0x1800;
+            switch (val_L)
+            {
+                case 0: hansen.addr_0x06 |= 0x0000;     break;
+                case 1: hansen.addr_0x06 |= 0x0800;     break;
+                case 2: hansen.addr_0x06 |= 0x1000;     break;
+                case 3: hansen.addr_0x06 |= 0x1800;     break;
+                default:                                break;
+            }
             
             break;
 
@@ -141,8 +166,67 @@ void gui_vol_ctrl( uint16_t addr, uint8_t val_H, uint8_t val_L)
             break;
 
         case 0x2033:
-            Write_Dgusii_Vp_byChar(0x1600,"ÇÇÃú",4);
-            
+
+            Write_Dgusii_Vp_byChar(0x20c0,utf_tab,4);
+
+            break;
+
+        case 0x2090:
+            addr_20a0 = 0;
+            break;
+
+        case 0x2098:
+            if( mima_val == 222222 )
+            {
+                jump_page(10);
+                mima_val = 0;
+                Write_Dgus(0x2090,0x01);
+                Write_Dgus(0x2091,0xe240);
+            } 
+           
+            break;
+
+        case 0x20a0:
+            if( val_L == 1 ) 
+            {
+                hansen.addr_0x20 = 0x0200;
+                hansen.paoji_flag = 1;
+            }else
+            {
+                hansen.addr_0x20 = 0x2000;
+                Write_Dgus(0x20a4,0);
+                Write_Dgus(0x20a3,0);
+                Write_Dgus(0x20a2,0);
+                jump_page(0);
+                hansen.paoji_flag = 0;
+            }  
+            addr_20a0 = val_L;
+
+            break;
+
+        case 0x20d6:
+            if( val_L == 4 )
+            {
+                hansen.addr_0x2d = 3;    
+            }
+            if( val_L == 3 )
+            {
+                hansen.addr_0x2d = 4;    
+            }
+            break;
+
+        case 0x20d7:
+            hansen.addr_0x2d = val_L;
+            break;  
+
+        case 0x20d8:
+            hansen.addr_0x2d = val_L;
+            jump_page(0);
+            break;
+
+        case 0x20a1:
+            if( addr_20a0 == 0 )
+            jump_page(0);
             break;
         /*          40001 ÉèÖÃalarm_tempF(val_L) alarm_tempM(val_H)          */
         case 0x2010:
@@ -203,5 +287,28 @@ void gui_vol_ctrl( uint16_t addr, uint8_t val_H, uint8_t val_L)
 
         default:
             break;
+    }
+}
+
+
+void jump_page( uint8_t page_num )
+{
+    Write_Dgus(0x0085,page_num);
+
+    Write_Dgus(0x0084,0x5A01);
+}
+
+void time_trans( uint16_t time_val ,uint8_t num )
+{
+    if( num == 0 )
+    {
+        dayin_t.cnt_h = time_val / 3600;
+        dayin_t.cnt_min = (time_val % 3600) / 60;
+        dayin_t.cnt_s = time_val % 60;
+    }else
+    {
+        dayin_t.remain_h = time_val / 3600;
+        dayin_t.remain_min = (time_val % 3600) / 60;
+        dayin_t.remain_s = time_val % 60;
     }
 }

@@ -4,6 +4,10 @@
         "gpio.h": "c",
         "string.h": "c",
         "t5los8051.h": "c",
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "uart.h": "c",
+        "sys.h": "c",
+        "eeprom_crl.h": "c",
+        "eeprom.h": "c"
     }
 }

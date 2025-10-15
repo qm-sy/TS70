@@ -21,10 +21,10 @@ void main()
 	gui_scan_flag = 0;
 	delay_ms(200);
 
-	EA    = 1;              //总中断开关
-	
 	sp350_parms_init();
 	diwen_parms_init();
+
+	EA    = 1;              //总中断开关
 	
 	printf(" ===== code start ====== \r\n");
 	
@@ -34,10 +34,19 @@ void main()
 		Modbus_Event_Uart2();
 		Modbus_Event_Uart4();
 		Modbus_Event_Uart5();
+
 		if( gui_scan_flag == 1 )		//50ms检测一次屏幕是否被按下
 		{
 			Sw_Data_Send();
 			gui_scan_flag = 0;
+		}
+		
+		if( hansen.paoji_send == 1 )
+		{
+			Write_Dgus(0x20a4,hansen.paoji_s);
+			Write_Dgus(0x20a3,hansen.paoji_min);
+			Write_Dgus(0x20a2,hansen.paoji_h);
+			hansen.paoji_send = 0;
 		}
 	}
 }

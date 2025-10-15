@@ -52,8 +52,8 @@ void Uart4_Send_Statu_Init( void )
 void Uart5_Send_Statu_Init( void )
 {
     rs485_5.RX_rcv_end_Flag = 0;
-    rs485_5.TX_buf[240] = 0;
-    rs485_5.RX_buf[240] = 0;
+    rs485_5.TX_buf[1024] = 0;
+    rs485_5.RX_buf[1024] = 0;
     rs485_5.TX_send_bytelength = 0;
     rs485_5.TX_send_cnt = 0;
     rs485_5.RX_rcv_timeout = 0;
@@ -233,7 +233,7 @@ void Uart5_RX_Isr() interrupt 13
         if( !rs485_5.RX_rcv_end_Flag )
         {
             /* 4, 数据包大于RX_buf 则从头计数                  */
-            if( rs485_5.RX_rcv_cnt > 240 )
+            if( rs485_5.RX_rcv_cnt > 1024 )
             {
                 rs485_5.RX_rcv_cnt = 0;
             }

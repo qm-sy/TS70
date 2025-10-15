@@ -13,6 +13,8 @@ bit			   Auto_data_upload;		//数据自动上传用
 bit			   Crc_check_flog;			//Crc校验标记
 bit			   download_flag;			//串口2通讯与下载区分标志位
 
+uint32_t mima_val = 0;
+
 void burn_params_init( void )
 {
 	R_OD2 = 0;
@@ -216,6 +218,13 @@ void  Sw_Data_Send()
 		
 		val_H = Val[7];
 		val_L = Val[8];
+		if( Val[6] == 2 )
+		{
+			if((Val[7]==0x00)&&(Val[8]==0x03)&&(Val[9]==0x64)&&(Val[10]==0x0e))
+			{
+				mima_val = 222222;
+			}
+		}
 
 		gui_vol_ctrl(addr_vol, val_H, val_L);
 

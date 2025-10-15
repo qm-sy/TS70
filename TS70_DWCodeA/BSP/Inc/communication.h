@@ -38,12 +38,12 @@ typedef struct
 typedef struct 
 {
     uint8_t     RX_rcv_end_Flag;       //数据包接收完毕标志
-    uint8_t     TX_buf[240];           //SBUF TI缓冲区
-    uint8_t     RX_buf[240];           //SBUF RI缓冲区
+    uint8_t     TX_buf[1024];           //SBUF TI缓冲区
+    uint8_t     RX_buf[1024];           //SBUF RI缓冲区
     uint8_t     TX_send_bytelength;    //发送字节数
     uint8_t     TX_send_cnt;           //发送计数
     uint16_t    RX_rcv_timeout;        //接收超时
-    uint8_t     RX_rcv_cnt;            //接收计数
+    uint16_t    RX_rcv_cnt;            //接收计数
     uint8_t     DR_Flag;                //DR
 }RS485_5;
 

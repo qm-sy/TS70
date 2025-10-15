@@ -30,6 +30,7 @@ extern bit Response_flog;       //应答用
 extern bit Auto_data_upload;    //数据自动上传用
 extern bit Crc_check_flog;      //Crc校验标记
 extern bit download_flag;
+extern uint32_t mima_val;
 
 void burn_params_init( void );
 void Uart2_Init( uint32_t baud );
