@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.7.0   UART                                                              10/15/2025 21:46:45 PAGE 1   
+C51 COMPILER V9.60.7.0   UART                                                              10/16/2025 17:12:36 PAGE 1   
 
 
 C51 COMPILER V9.60.7.0, COMPILATION OF MODULE UART
@@ -62,7 +62,7 @@ line level    source
   51   1        SCON2R= 0x80;       //接受使能和模式设置 
   52   1        ES2R = 1;           //中断接受使能
   53   1          ES2T = 1;           //中断发送使能
-C51 COMPILER V9.60.7.0   UART                                                              10/15/2025 21:46:45 PAGE 2   
+C51 COMPILER V9.60.7.0   UART                                                              10/16/2025 17:12:36 PAGE 2   
 
   54   1      
   55   1          baud = FOSC/8/baud;
@@ -126,7 +126,7 @@ line level    source
  113   3            {
  114   4              N++;
  115   4            }   
-C51 COMPILER V9.60.7.0   UART                                                              10/15/2025 21:46:45 PAGE 3   
+C51 COMPILER V9.60.7.0   UART                                                              10/16/2025 17:12:36 PAGE 3   
 
  116   3          }
  117   2          if( N < (*Data_len - 4)) 
@@ -190,7 +190,7 @@ line level    source
  175          
  176          void uart_send_byte(uint8_t Uart_number, uint8_t Dat)
  177          {
-C51 COMPILER V9.60.7.0   UART                                                              10/15/2025 21:46:45 PAGE 4   
+C51 COMPILER V9.60.7.0   UART                                                              10/16/2025 17:12:36 PAGE 4   
 
  178   1          download_flag = 1;
  179   1      
@@ -254,7 +254,7 @@ line level    source
  237          void uart_data_send(uint8_t* Arr,uint8_t Uartnum,bit Outo_send,bit Crc_ck )
  238          {
  239   1        uint8_t i = 0;      
-C51 COMPILER V9.60.7.0   UART                                                              10/15/2025 21:46:45 PAGE 5   
+C51 COMPILER V9.60.7.0   UART                                                              10/16/2025 17:12:36 PAGE 5   
 
  240   1        Auto_data_upload = Outo_send;
  241   1        if( Auto_data_upload ) 

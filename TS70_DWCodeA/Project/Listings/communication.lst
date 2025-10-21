@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.7.0   COMMUNICATION                                                     10/15/2025 21:46:45 PAGE 1   
+C51 COMPILER V9.60.7.0   COMMUNICATION                                                     10/16/2025 17:12:36 PAGE 1   
 
 
 C51 COMPILER V9.60.7.0, COMPILATION OF MODULE COMMUNICATION
@@ -62,7 +62,7 @@ line level    source
   51          **/
   52          void Uart5_Send_Statu_Init( void )
   53          {
-C51 COMPILER V9.60.7.0   COMMUNICATION                                                     10/15/2025 21:46:45 PAGE 2   
+C51 COMPILER V9.60.7.0   COMMUNICATION                                                     10/16/2025 17:12:36 PAGE 2   
 
   54   1          rs485_5.RX_rcv_end_Flag = 0;
   55   1          rs485_5.TX_buf[1024] = 0;
@@ -126,7 +126,7 @@ line level    source
  113   3                  if( rs485_2.RX2_rev_cnt > 128 )
  114   3                  {
  115   4                      rs485_2.RX2_rev_cnt = 0;
-C51 COMPILER V9.60.7.0   COMMUNICATION                                                     10/15/2025 21:46:45 PAGE 3   
+C51 COMPILER V9.60.7.0   COMMUNICATION                                                     10/16/2025 17:12:36 PAGE 3   
 
  116   4                  }
  117   3      
@@ -190,7 +190,7 @@ line level    source
  175          //             if( rs485_4.RX4_rev_cnt > 128 )
  176          //             {
  177          //                 rs485_4.RX4_rev_cnt = 0;
-C51 COMPILER V9.60.7.0   COMMUNICATION                                                     10/15/2025 21:46:45 PAGE 4   
+C51 COMPILER V9.60.7.0   COMMUNICATION                                                     10/16/2025 17:12:36 PAGE 4   
 
  178          //             }
  179          
@@ -254,7 +254,7 @@ line level    source
  237   3                  {
  238   4                      rs485_5.RX_rcv_cnt = 0;
  239   4                  }
-C51 COMPILER V9.60.7.0   COMMUNICATION                                                     10/15/2025 21:46:45 PAGE 5   
+C51 COMPILER V9.60.7.0   COMMUNICATION                                                     10/16/2025 17:12:36 PAGE 5   
 
  240   3      
  241   3                  /* 5, 依次将RX_buf中数据接收（读S2BUF操作即为接收）*/
@@ -318,7 +318,7 @@ line level    source
  299   1      }
  300          
  301          
-C51 COMPILER V9.60.7.0   COMMUNICATION                                                     10/15/2025 21:46:45 PAGE 6   
+C51 COMPILER V9.60.7.0   COMMUNICATION                                                     10/16/2025 17:12:36 PAGE 6   
 
  302          void uart4_send_byte( uint8_t byte )
  303          {

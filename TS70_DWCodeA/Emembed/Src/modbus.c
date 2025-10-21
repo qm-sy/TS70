@@ -358,15 +358,14 @@ void Modbus_Fun16( void )
                     
                     case 0:         hansen.addr_0x21 = 0;    hansen.addr_0x20 = 0;            break;      //停止装墨    
                     case 2:         hansen.addr_0x20 = 0;         
-                                    sys_write_vp(0x2020,(uint8_t*)&(hansen.addr_0x20),1);     break;      //复位 
+                                    Write_Dgus(0x2020,0);                                                         break;      //复位 
                               
                     case 3:         hansen.addr_0x30 = 0;                                     break;      //打印       
                     case 6:         hansen.addr_0x21 = 0;    hansen.addr_0x22 = 0;    hansen.addr_0x23 = 0;   
-                                    sys_write_vp(0x2022,(uint8_t*)&(hansen.addr_0x22),1);     
-                                    sys_write_vp(0x2023,(uint8_t*)&(hansen.addr_0x23),1);     break;      //清洗 
+                                                                     break;      //清洗 
                                     
                     case 10:        hansen.addr_0x21 = 0;    hansen.addr_0x23 = 0;
-                                    sys_write_vp(0x2023,(uint8_t*)&(hansen.addr_0x23),1);     break;      //开始装墨
+                                                                    break;      //开始装墨
                     case 12:        hansen.addr_0x20 = 0;                                     break;      //开始装墨
                     default:                                                                  break;
                 }
@@ -379,8 +378,12 @@ void Modbus_Fun16( void )
 
                 switch(hansen.addr_0x0102)
                 { 
-                    case 0:         Write_Dgusii_Vp_byChar(0x1600,"  空闲  ",8);      
-                                    hansen.ctrl_flag = 1; 
+                    case 0:         Write_Dgusii_Vp_byChar(0x1600,"  空闲  ",8); 
+                                    if( hansen.ctrl_flag == 0 )
+                                    {
+                                        hansen.ctrl_flag = 1;
+                                        jump_page(0);
+                                    }     
                                     break;
                     case 1:         if( hansen.ctrl_flag == 0 )
                                     {
@@ -597,6 +600,10 @@ void Modbus_Fun16( void )
 
             case 0x0161:
                 hansen.addr_0x22 = (rs485_5.RX_buf[modbus5.rcv_value_addr] << 8) | rs485_5.RX_buf[modbus5.rcv_value_addr + 1];
+                if( hansen.addr_0x22 == 4)
+                {
+                    hansen.addr_0x22 = 3;
+                }
                 Write_Dgus(0x2022,hansen.addr_0x22);
                 hansen.addr_0x22 = 0;    
                 break;

@@ -48,6 +48,7 @@ void diwen_parms_init( void )
 
     hansen.paoji_flag = hansen.paoji_send = 0;
     hansen.paoji_h = hansen.paoji_min = hansen.paoji_s = 0;
+    jump_page(12);
 }
 
 void gui_vol_ctrl( uint16_t addr, uint8_t val_H, uint8_t val_L)
@@ -81,6 +82,10 @@ void gui_vol_ctrl( uint16_t addr, uint8_t val_H, uint8_t val_L)
 
         case 0x2022:
             hansen.addr_0x22 = (val_H << 8) |  val_L;
+            if( hansen.addr_0x22 == 3 )
+            {
+                hansen.addr_0x22 = 4;
+            }
             
             break;   
 
