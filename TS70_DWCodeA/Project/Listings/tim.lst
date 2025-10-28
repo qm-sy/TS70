@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.7.0   TIM                                                               10/16/2025 17:12:36 PAGE 1   
+C51 COMPILER V9.60.7.0   TIM                                                               10/24/2025 16:55:10 PAGE 1   
 
 
 C51 COMPILER V9.60.7.0, COMPILATION OF MODULE TIM
@@ -43,60 +43,74 @@ line level    source
   32          {
   33   1          static uint8_t press_scan_cnt = 0;
   34   1          static uint16_t paoji_cnt = 0;
-  35   1      
-  36   1          TH0   = (uint8_t)(T0_PERIOD_1MS>>8);
-  37   1          TL0   = (uint8_t)T0_PERIOD_1MS;      
-  38   1      
-  39   1        if(T_O2 > 0)
-  40   1          {
-  41   2              T_O2--;
-  42   2          }
-  43   1      
-  44   1          if( gui_scan_flag == 0 )
-  45   1          {
-  46   2              press_scan_cnt++;
-  47   2              if( press_scan_cnt == 50 )
-  48   2              {
-  49   3                  press_scan_cnt = 0;
-  50   3                  gui_scan_flag = 1;
-  51   3              }
-  52   2          }
-  53   1      
-C51 COMPILER V9.60.7.0   TIM                                                               10/16/2025 17:12:36 PAGE 2   
+  35   1          static uint16_t scan_03_cnt = 0;
+  36   1      
+  37   1          TH0   = (uint8_t)(T0_PERIOD_1MS>>8);
+  38   1          TL0   = (uint8_t)T0_PERIOD_1MS;      
+  39   1      
+  40   1        if(T_O2 > 0)
+  41   1          {
+  42   2              T_O2--;
+  43   2          }
+  44   1      
+  45   1          if( gui_scan_flag == 0 )
+  46   1          {
+  47   2              press_scan_cnt++;
+  48   2              if( press_scan_cnt == 50 )
+  49   2              {
+  50   3                  press_scan_cnt = 0;
+  51   3                  gui_scan_flag = 1;
+  52   3              }
+  53   2          }
+C51 COMPILER V9.60.7.0   TIM                                                               10/24/2025 16:55:10 PAGE 2   
 
-  54   1          if( hansen.paoji_flag  == 1 )
-  55   1          {
-  56   2              paoji_cnt++;
-  57   2              if( paoji_cnt == 1000 )
-  58   2              {
-  59   3                  paoji_cnt = 0;
-  60   3                  hansen.paoji_s++;
-  61   3                  if( hansen.paoji_s == 60 )
-  62   3                  {
-  63   4                      hansen.paoji_s = 0;
-  64   4                      hansen.paoji_min++;
-  65   4                      if( hansen.paoji_min == 60 )
-  66   4                      {
-  67   5                          hansen.paoji_min = 0;
-  68   5                          hansen.paoji_h++;
-  69   5                      }
-  70   4                  }
-  71   3                  hansen.paoji_send = 1;
-  72   3              }
-  73   2          }else
-  74   1          {
-  75   2              hansen.paoji_send = 0;
-  76   2              hansen.paoji_h = hansen.paoji_min = hansen.paoji_s = 0;
-  77   2              paoji_cnt = 0;
-  78   2          }
-  79   1      }
-  80          
+  54   1      
+  55   1          if( hansen.paoji_flag  == 1 )
+  56   1          {
+  57   2              paoji_cnt++;
+  58   2              if( paoji_cnt == 1000 )
+  59   2              {
+  60   3                  paoji_cnt = 0;
+  61   3                  hansen.paoji_s++;
+  62   3                  if( hansen.paoji_s == 60 )
+  63   3                  {
+  64   4                      hansen.paoji_s = 0;
+  65   4                      hansen.paoji_min++;
+  66   4                      if( hansen.paoji_min == 60 )
+  67   4                      {
+  68   5                          hansen.paoji_min = 0;
+  69   5                          hansen.paoji_h++;
+  70   5                      }
+  71   4                  }
+  72   3                  hansen.paoji_send = 1;
+  73   3              }
+  74   2          }else
+  75   1          {
+  76   2              hansen.paoji_send = 0;
+  77   2              hansen.paoji_h = hansen.paoji_min = hansen.paoji_s = 0;
+  78   2              paoji_cnt = 0;
+  79   2          }
+  80   1      
+  81   1          if(( sp350.params_get_flag1 == 1 ) && ( sp350.params_get_flag2 == 0 ))
+  82   1          {
+  83   2              scan_03_cnt++;
+  84   2              if( scan_03_cnt == 200 )
+  85   2              {
+  86   3                  sp350.params_get_flag2 = 1;
+  87   3                  scan_03_cnt = 0;
+  88   3              }
+  89   2          }else
+  90   1          {
+  91   2              scan_03_cnt = 0;
+  92   2          }
+  93   1      }
+  94          
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =    237    ----
+   CODE SIZE        =    288    ----
    CONSTANT SIZE    =   ----    ----
-   XDATA SIZE       =      3    ----
+   XDATA SIZE       =      5    ----
    PDATA SIZE       =   ----    ----
    DATA SIZE        =   ----    ----
    IDATA SIZE       =   ----    ----

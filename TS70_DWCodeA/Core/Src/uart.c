@@ -57,7 +57,7 @@ void Uart4_Init( uint32_t baud )
     BODE2_DIV_H = (uint8_t)(baud>>8);
     BODE2_DIV_L = (uint8_t)baud;
 
-    // TR4=0;
+    TR4=0;
 }
 
 void Uart5_Init( uint32_t baud )
@@ -214,7 +214,7 @@ void  Sw_Data_Send()
 			Val[8 + 2 * i] = (uint8_t)(Temp);
 		}
 		addr_vol = (Val[4] << 8) | ( Val[5] & 0xff);
-		printf("addr is %04x\r\n",addr_vol);
+		// printf("addr is %04x\r\n",addr_vol);
 		
 		val_H = Val[7];
 		val_L = Val[8];

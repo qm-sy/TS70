@@ -19,14 +19,16 @@ void main()
 	Tim1_Init();
 	
 	gui_scan_flag = 0;
+	sp350.params_get_flag1 = 1;
+	sp350.params_get_flag2 = 1;
+
 	delay_ms(200);
 
-	sp350_parms_init();
 	diwen_parms_init();
 
 	EA    = 1;              //总中断开关
 	
-	printf(" ===== code start ====== \r\n");
+	// printf(" ===== code start ====== \r\n");
 	
 	while(1)
 	{
@@ -47,6 +49,11 @@ void main()
 			Write_Dgus(0x20a3,hansen.paoji_min);
 			Write_Dgus(0x20a2,hansen.paoji_h);
 			hansen.paoji_send = 0;
+		}
+		if( sp350.params_get_flag2 == 1 )
+		{
+			get_slave_03();
+			sp350.params_get_flag2 = 0;
 		}
 	}
 }

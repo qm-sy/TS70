@@ -1,0 +1,55 @@
+#ifndef __MODBUS_RTU_H_
+#define __MODBUS_RTU_H_
+
+#include "communication.h"
+#include "ntc.h"
+#include "gpio.h"
+#include "power_crl.h"
+#include "eeprom_crl.h"
+#include "dht11.h"
+
+#define MY_ADDR     0x02
+
+typedef struct 
+{
+    uint8_t  byte_info_H;                //DATA_H
+    uint8_t  byte_info_L;                //DATA_L
+    uint8_t  byte_cnt;                   //BYTE NUM*2
+    uint8_t  send_value_addr;            //DATA1 H 位置
+    uint8_t  rcv_value_addr;             //DATA1 H 位置
+    uint16_t start_addr;                 //查询起始位置
+}MODBIS_INFO;
+
+typedef struct 
+{    
+    uint8_t  envir_temp;
+    uint8_t  envir_humidity;
+}SLAVE_04;
+
+typedef struct 
+{    
+    uint8_t  F_switch;
+    uint8_t  M_switch;
+    uint8_t  R_switch;
+    uint8_t  F_alarm_val;
+    uint8_t  M_alarm_val;
+    uint8_t  R_alarm_val;
+    uint8_t  led_switch;   
+    uint8_t  fan_level;             
+    uint8_t  fan_switch;   
+}SLAVE_06;
+
+extern MODBIS_INFO modbus;
+extern SLAVE_04 slave_04;
+extern SLAVE_06 slave_06;
+
+void Modbus_Event( void );
+void Modbus_Fun3( void );
+void Modbus_Fun4( void );
+void Modbus_Fun6( void );
+void Modbus_Fun16( void );
+void slave_to_master(uint8_t code_num,uint8_t length);
+uint16_t MODBUS_CRC16(uint8_t *buf, uint8_t length);
+void slave_scan( void );
+
+#endif

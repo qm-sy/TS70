@@ -6,28 +6,15 @@ DAYIN_T dayin_t;
 
 void sp350_parms_init( void )
 {
-    sp350.alarm_tempF = 50;         
-    sp350.alarm_tempM = 55;         
-    sp350.alarm_tempR = 60;         
-    sp350.F_switch    = 1;          
-    sp350.M_switch    = 1;          
-    sp350.R_switch    = 1;          
-    sp350.LED_switch  = 1;          
-    sp350.fan_switch  = 1;         
-    sp350.fan_level   = 1;
-
-    sys_write_vp(0x2010,(uint8_t*)&sp350.alarm_tempF,1);
-    sys_write_vp(0x2011,(uint8_t*)&sp350.alarm_tempM,1);
-    sys_write_vp(0x2012,(uint8_t*)&sp350.alarm_tempR,1);
-
-    sys_write_vp(0x2013,(uint8_t*)&sp350.F_switch,1);
-    sys_write_vp(0x2014,(uint8_t*)&sp350.M_switch,1);
-    sys_write_vp(0x2015,(uint8_t*)&sp350.R_switch,1);
-
-    sys_write_vp(0x2016,(uint8_t*)&sp350.LED_switch,1);
-
-    sys_write_vp(0x2017,(uint8_t*)&sp350.fan_switch,1);
-    sys_write_vp(0x201a,(uint8_t*)&sp350.fan_level,1);
+    Write_Dgus(0x2010,(uint16_t)sp350.F_alarm_val);
+    Write_Dgus(0x2011,(uint16_t)sp350.M_alarm_val);
+    Write_Dgus(0x2012,(uint16_t)sp350.R_alarm_val);
+    Write_Dgus(0x2013,(uint16_t)sp350.F_switch);
+    Write_Dgus(0x2014,(uint16_t)sp350.M_switch);
+    Write_Dgus(0x2015,(uint16_t)sp350.R_switch);
+    Write_Dgus(0x2016,(uint16_t)sp350.LED_switch);
+    Write_Dgus(0x2017,(uint16_t)sp350.fan_level);
+    Write_Dgus(0x2018,(uint16_t)sp350.fan_switch);
 }
 
 void diwen_parms_init( void )
@@ -96,6 +83,7 @@ void gui_vol_ctrl( uint16_t addr, uint8_t val_H, uint8_t val_L)
 
         case 0x2030:
             hansen.addr_0x30 = (val_H << 8) |  val_L;
+            fuyin_flag = 1;
             
             break;
 
@@ -221,7 +209,12 @@ void gui_vol_ctrl( uint16_t addr, uint8_t val_H, uint8_t val_L)
             break;
 
         case 0x20d7:
-            hansen.addr_0x2d = val_L;
+            if(hansen.addr_0x2d == 3 )
+            {
+                hansen.addr_0x21 = 1;
+                Write_Dgusii_Vp_byChar(0x1600,"印中清洗",8);
+            }
+
             break;  
 
         case 0x20d8:
@@ -233,22 +226,22 @@ void gui_vol_ctrl( uint16_t addr, uint8_t val_H, uint8_t val_L)
             if( addr_20a0 == 0 )
             jump_page(0);
             break;
-        /*          40001 设置alarm_tempF(val_L) alarm_tempM(val_H)          */
+        /*          40001 设置F_alarm_val(val_L) M_alarm_val(val_H)          */
         case 0x2010:
-            sp350.alarm_tempF = val_L;
-            write_slave_06(UART_5,ALARM_TEMP12_ADDR,(uint8_t)sp350.alarm_tempM,(uint8_t)sp350.alarm_tempF);  
+            sp350.F_alarm_val = val_L;
+            write_slave_06(F_TEMP_ALARM,0,sp350.F_alarm_val);  
 
             break;
         
         case 0x2011:
-            sp350.alarm_tempM = val_L;
-            write_slave_06(UART_5,ALARM_TEMP12_ADDR,(uint8_t)sp350.alarm_tempM,(uint8_t)sp350.alarm_tempF);   
+            sp350.M_alarm_val = val_L;
+            write_slave_06(M_TEMP_ALARM,0,sp350.M_alarm_val);    
 
             break;
 
         case 0x2012:
-            sp350.alarm_tempR = val_L;
-            write_slave_06(UART_5,ALARM_TEMP3_ADDR,0,(uint8_t)sp350.alarm_tempR);  
+            sp350.R_alarm_val = val_L;
+            write_slave_06(R_TEMP_ALARM,0,sp350.R_alarm_val);  
             
             break;
 
@@ -256,37 +249,37 @@ void gui_vol_ctrl( uint16_t addr, uint8_t val_H, uint8_t val_L)
         /*          40002 设置 F\M\R  Switch                                 */
         case 0x2013:
             sp350.F_switch = val_L;
-            write_slave_06(UART_5,FM_SWITCH_ADDR,(uint8_t)sp350.M_switch,(uint8_t)sp350.F_switch);  
+            write_slave_06(F_AC_SWITCH,0,sp350.F_switch);  
 
             break;
         
         case 0x2014:
             sp350.M_switch = val_L;
-            write_slave_06(UART_5,FM_SWITCH_ADDR,(uint8_t)sp350.M_switch,(uint8_t)sp350.F_switch); 
+            write_slave_06(M_AC_SWITCH,0,sp350.M_switch); 
 
             break;
 
         case 0x2015:
             sp350.R_switch = val_L;
-            write_slave_06(UART_5,R_SWITCH_ADDR,0,(uint8_t)sp350.R_switch); 
+            write_slave_06(R_AC_SWITCH,0,sp350.R_switch); 
 
             break;
 
         case 0x2016:
             sp350.LED_switch = val_L;
-            write_slave_06(UART_5,LED_SWITCH_ADDR,0,(uint8_t)sp350.LED_switch); 
+            write_slave_06(LED_ADDR,0,sp350.LED_switch); 
 
             break;
 
         case 0x2017:
-            sp350.fan_switch = val_L;
-            write_slave_06(UART_5,LED_SWITCH_ADDR,(uint8_t)sp350.fan_switch,(uint8_t)sp350.fan_level); 
+            sp350.fan_level = val_L;
+            write_slave_06(FAN_ADDR,0,sp350.fan_level); 
 
             break; 
 
-        case 0x3018:
-            sp350.fan_level = val_L;
-            write_slave_06(UART_5,FAN_ADDR,(uint8_t)sp350.fan_switch,(uint8_t)sp350.fan_level); 
+        case 0x2018:
+            sp350.fan_switch = val_L;
+            write_slave_06(FAN_SWITCH,0,sp350.fan_switch); 
 
             break; 
 

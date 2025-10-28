@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.7.0   COMMUNICATION                                                     10/16/2025 17:12:36 PAGE 1   
+C51 COMPILER V9.60.7.0   COMMUNICATION                                                     10/24/2025 16:55:10 PAGE 1   
 
 
 C51 COMPILER V9.60.7.0, COMPILATION OF MODULE COMMUNICATION
@@ -43,313 +43,311 @@ line level    source
   32          **/
   33          void Uart4_Send_Statu_Init( void )
   34          {
-  35   1          rs485_4.RX4_rev_end_Flag = 0;
-  36   1          rs485_4.TX4_buf[128] = 0;
-  37   1          rs485_4.RX4_buf[128] = 0;
-  38   1          rs485_4.TX4_send_bytelength = 0;
-  39   1          rs485_4.TX4_send_cnt = 0;
-  40   1          rs485_4.RX4_rev_timeout = 0;
-  41   1          rs485_4.RX4_rev_cnt = 0;
-  42   1          //DR_485 = 0;
-  43   1      }
-  44          
-  45          /**
-  46           * @brief 串口5调用结构体 rs485_5 初始化
-  47           *
-  48           * @param   
-  49           *
-  50           * @return  void
-  51          **/
-  52          void Uart5_Send_Statu_Init( void )
-  53          {
-C51 COMPILER V9.60.7.0   COMMUNICATION                                                     10/16/2025 17:12:36 PAGE 2   
+  35   1          rs485_4.RX_rcv_end_Flag = 0;
+  36   1          rs485_4.TX_buf[128] = 0;
+  37   1          rs485_4.RX_buf[128] = 0;
+  38   1          rs485_4.TX_send_bytelength = 0;
+  39   1          rs485_4.TX_send_cnt = 0;
+  40   1          rs485_4.RX_rcv_timeout = 0;
+  41   1          rs485_4.RX_rcv_cnt = 0;
+  42   1      }
+  43          
+  44          /**
+  45           * @brief 串口5调用结构体 rs485_5 初始化
+  46           *
+  47           * @param   
+  48           *
+  49           * @return  void
+  50          **/
+  51          void Uart5_Send_Statu_Init( void )
+  52          {
+  53   1          rs485_5.RX_rcv_end_Flag = 0;
+C51 COMPILER V9.60.7.0   COMMUNICATION                                                     10/24/2025 16:55:10 PAGE 2   
 
-  54   1          rs485_5.RX_rcv_end_Flag = 0;
-  55   1          rs485_5.TX_buf[1024] = 0;
-  56   1          rs485_5.RX_buf[1024] = 0;
-  57   1          rs485_5.TX_send_bytelength = 0;
-  58   1          rs485_5.TX_send_cnt = 0;
-  59   1          rs485_5.RX_rcv_timeout = 0;
-  60   1          rs485_5.RX_rcv_cnt = 0;
-  61   1          //DR_485 = 0;
-  62   1      }
-  63          
-  64          /**
-  65           * @brief 串口4中断处理函数
+  54   1          rs485_5.TX_buf[1024] = 0;
+  55   1          rs485_5.RX_buf[1024] = 0;
+  56   1          rs485_5.TX_send_bytelength = 0;
+  57   1          rs485_5.TX_send_cnt = 0;
+  58   1          rs485_5.RX_rcv_timeout = 0;
+  59   1          rs485_5.RX_rcv_cnt = 0;
+  60   1      }
+  61          
+  62          /**
+  63           * @brief 串口4中断处理函数
+  64           *
+  65           * @param   
   66           *
-  67           * @param   
-  68           *
-  69           * @return  void
-  70          **/
-  71          void Uart2_RXTX_Isr( void ) interrupt 4 
-  72          {   
-  73   1      
-  74   1          /* 1, 检测到S4TI置1，即发送完毕                       */
-  75   1          if( TI0 == 1)          //
-  76   1          {
-  77   2              /* 2, 软件将S4TI清零，等待发送标志位重置，可继续发送    */
-  78   2              TI0 = 0;    
-  79   2              Busy2 = 0;   
-  80   2              /* 3, 依次将TX2_buf中数据送出（写SBUF0操作即为发送）    */
-  81   2              if( download_flag == 0 )
-  82   2              {
-  83   3                  if( rs485_2.TX2_send_bytelength != 0 )
-  84   3                  {
-  85   4                      SBUF0 = rs485_2.TX2_buf[rs485_2.TX2_send_cnt++];
-  86   4                      rs485_2.TX2_send_bytelength--;
-  87   4                  }else
-  88   3                  {
-  89   4                      rs485_2.TX2_send_cnt = 0;
-  90   4                      //DR_485 = 0;
-  91   4                  }
-  92   3              }
-  93   2          }
-  94   1          
-  95   1          /* 1, 检测到S2RI置1，即接收完毕                       */
-  96   1          if( RI0 == 1 )
-  97   1          {
-  98   2              /* 2, 软件将S2RI清零，等待接收标志位重置，可继续发送    */
-  99   2              RI0 = 0;
- 100   2      
- 101   2              R_u2[R_CN2] = SBUF0;
- 102   2          R_OD2 = 1;
- 103   2          if(R_CN2<UART2_RX_LENTH-1)
- 104   2          {
- 105   3            R_CN2++;
- 106   3          } 
- 107   2          T_O2=5; 
- 108   2              
- 109   2              /* 3, 判断数据包是否接收完毕                           */
- 110   2              if( !rs485_2.RX2_rev_end_Flag )
- 111   2              {
- 112   3                  /* 4, 数据包大于RX_buf 则从头计数                  */
- 113   3                  if( rs485_2.RX2_rev_cnt > 128 )
- 114   3                  {
- 115   4                      rs485_2.RX2_rev_cnt = 0;
-C51 COMPILER V9.60.7.0   COMMUNICATION                                                     10/16/2025 17:12:36 PAGE 3   
+  67           * @return  void
+  68          **/
+  69          void Uart2_RXTX_Isr( void ) interrupt 4 
+  70          {   
+  71   1      
+  72   1          /* 1, 检测到S4TI置1，即发送完毕                       */
+  73   1          if( TI0 == 1)          //
+  74   1          {
+  75   2              /* 2, 软件将S4TI清零，等待发送标志位重置，可继续发送    */
+  76   2              TI0 = 0;    
+  77   2              Busy2 = 0;   
+  78   2              /* 3, 依次将TX2_buf中数据送出（写SBUF0操作即为发送）    */
+  79   2              if( download_flag == 0 )
+  80   2              {
+  81   3                  if( rs485_2.TX2_send_bytelength != 0 )
+  82   3                  {
+  83   4                      SBUF0 = rs485_2.TX2_buf[rs485_2.TX2_send_cnt++];
+  84   4                      rs485_2.TX2_send_bytelength--;
+  85   4                  }else
+  86   3                  {
+  87   4                      rs485_2.TX2_send_cnt = 0;
+  88   4                      //DR_485 = 0;
+  89   4                  }
+  90   3              }
+  91   2          }
+  92   1          
+  93   1          /* 1, 检测到S2RI置1，即接收完毕                       */
+  94   1          if( RI0 == 1 )
+  95   1          {
+  96   2              /* 2, 软件将S2RI清零，等待接收标志位重置，可继续发送    */
+  97   2              RI0 = 0;
+  98   2      
+  99   2              R_u2[R_CN2] = SBUF0;
+ 100   2          R_OD2 = 1;
+ 101   2          if(R_CN2<UART2_RX_LENTH-1)
+ 102   2          {
+ 103   3            R_CN2++;
+ 104   3          } 
+ 105   2          T_O2=5; 
+ 106   2              
+ 107   2              /* 3, 判断数据包是否接收完毕                           */
+ 108   2              if( !rs485_2.RX2_rev_end_Flag )
+ 109   2              {
+ 110   3                  /* 4, 数据包大于RX_buf 则从头计数                  */
+ 111   3                  if( rs485_2.RX2_rev_cnt > 128 )
+ 112   3                  {
+ 113   4                      rs485_2.RX2_rev_cnt = 0;
+ 114   4                  }
+ 115   3      
+C51 COMPILER V9.60.7.0   COMMUNICATION                                                     10/24/2025 16:55:10 PAGE 3   
 
- 116   4                  }
- 117   3      
- 118   3                  /* 5, 依次将RX2_buf中数据接收（读S2BUF操作即为接收）*/
- 119   3                  rs485_2.RX2_buf[rs485_2.RX2_rev_cnt] = SBUF0;
- 120   3                  rs485_2.RX2_rev_cnt++;
- 121   3              }
- 122   2              /* 6, 重置接收完毕判断时间                              */
- 123   2              rs485_2.RX2_rev_timeout = 5;
- 124   2          }
- 125   1      
- 126   1      }
- 127          
- 128          
- 129          /**
- 130           * @brief 串口4中断处理函数
+ 116   3                  /* 5, 依次将RX2_buf中数据接收（读S2BUF操作即为接收）*/
+ 117   3                  rs485_2.RX2_buf[rs485_2.RX2_rev_cnt] = SBUF0;
+ 118   3                  rs485_2.RX2_rev_cnt++;
+ 119   3              }
+ 120   2              /* 6, 重置接收完毕判断时间                              */
+ 121   2              rs485_2.RX2_rev_timeout = 5;
+ 122   2          }
+ 123   1      
+ 124   1      }
+ 125          
+ 126          
+ 127          /**
+ 128           * @brief 串口4中断处理函数
+ 129           *
+ 130           * @param   
  131           *
- 132           * @param   
- 133           *
- 134           * @return  void
- 135          **/
- 136          void Uart4_TX_Isr() interrupt 10 
- 137          {   
- 138   1          /* 1, 检测到S4TI置1，即发送完毕                       */
- 139   1          if( SCON2T & S4TI )          //
- 140   1          {
- 141   2              /* 2, 软件将S4TI清零，等待发送标志位重置，可继续发送    */
- 142   2              SCON2T &= ~S4TI;    
- 143   2              Busy4 = 0;
- 144   2              /* 3, 依次将TX4_buf中数据送出（写SBUF0操作即为发送）    */
- 145   2              // if( rs485_4.TX4_send_bytelength != 0 )
- 146   2              // {
- 147   2              //     SBUF2_TX = rs485_4.TX4_buf[rs485_4.TX4_send_cnt++];
- 148   2              //     rs485_4.TX4_send_bytelength--;
- 149   2              // }else
- 150   2              // {
- 151   2              //     rs485_4.TX4_send_cnt = 0;
- 152   2              //     //DR_485 = 0;
- 153   2              // }
- 154   2          }
- 155   1      }
- 156          
- 157          // /**
- 158          //  * @brief  串口4中断处理函数
- 159          //  *
- 160          //  * @param   
- 161          //  *
- 162          //  * @return  void
- 163          // **/
- 164          // void Uart4_RX_Isr() interrupt 11 
- 165          // {   
- 166          //         /* 1, 检测到S2RI置1，即接收完毕                       */
- 167          //     if( SCON2R & S4RI )
- 168          //     {
- 169          //         /* 2, 软件将S2RI清零，等待接收标志位重置，可继续发送    */
- 170          //         SCON2R &= ~S4RI; 
- 171          //         /* 3, 判断数据包是否接收完毕                           */
- 172          //         if( !rs485_4.RX4_rev_end_Flag )
- 173          //         {
- 174          //             /* 4, 数据包大于RX_buf 则从头计数                  */
- 175          //             if( rs485_4.RX4_rev_cnt > 128 )
- 176          //             {
- 177          //                 rs485_4.RX4_rev_cnt = 0;
-C51 COMPILER V9.60.7.0   COMMUNICATION                                                     10/16/2025 17:12:36 PAGE 4   
+ 132           * @return  void
+ 133          **/
+ 134          void Uart4_TX_Isr() interrupt 10 
+ 135          {   
+ 136   1          /* 1, 检测到S4TI置1，即发送完毕                       */
+ 137   1          if( SCON2T & S4TI )          //
+ 138   1          {
+ 139   2              /* 2, 软件将S4TI清零，等待发送标志位重置，可继续发送    */
+ 140   2              SCON2T &= ~S4TI;    
+ 141   2              //Busy4 = 0;
+ 142   2              /* 3, 依次将TX_buf中数据送出（写SBUF0操作即为发送）    */
+ 143   2              if( rs485_4.TX_send_bytelength != 0 )
+ 144   2              {
+ 145   3                  SBUF2_TX = rs485_4.TX_buf[rs485_4.TX_send_cnt++];
+ 146   3                  rs485_4.TX_send_bytelength--;
+ 147   3              }else
+ 148   2              {
+ 149   3                  rs485_4.TX_send_cnt = 0;
+ 150   3                  TR4 = 0;
+ 151   3              }
+ 152   2          }
+ 153   1      }
+ 154          
+ 155          /**
+ 156           * @brief 串口4中断处理函数
+ 157           *
+ 158           * @param   
+ 159           *
+ 160           * @return  void
+ 161          **/
+ 162          void Uart4_RX_Isr() interrupt 11 
+ 163          {   
+ 164   1              /* 1, 检测到S2RI置1，即接收完毕                       */
+ 165   1          if( SCON2R & S4RI )
+ 166   1          {
+ 167   2              /* 2, 软件将S2RI清零，等待接收标志位重置，可继续发送    */
+ 168   2              SCON2R &= ~S4RI; 
+ 169   2              /* 3, 判断数据包是否接收完毕                           */
+ 170   2              if( !rs485_4.RX_rcv_end_Flag )
+ 171   2              {
+ 172   3                  /* 4, 数据包大于RX_buf 则从头计数                  */
+ 173   3                  if( rs485_4.RX_rcv_cnt > 128 )
+ 174   3                  {
+ 175   4                      rs485_4.RX_rcv_cnt = 0;
+ 176   4                  }
+ 177   3      
+C51 COMPILER V9.60.7.0   COMMUNICATION                                                     10/24/2025 16:55:10 PAGE 4   
 
- 178          //             }
- 179          
- 180          //             /* 5, 依次将RX4_buf中数据接收（读S2BUF操作即为接收）*/
- 181          //             rs485_4.RX4_buf[rs485_4.RX4_rev_cnt] = SBUF2_RX;
- 182          //             rs485_4.RX4_rev_cnt++;
- 183          //         }
- 184          //         /* 6, 重置接收完毕判断时间                              */
- 185          //         rs485_4.RX4_rev_timeout = 5;
- 186          //     }
- 187          // }
- 188          
- 189          
- 190          /**
- 191           * @brief 串口5中断处理函数
+ 178   3                  /* 5, 依次将RX_buf中数据接收（读S2BUF操作即为接收）*/
+ 179   3                  rs485_4.RX_buf[rs485_4.RX_rcv_cnt] = SBUF2_RX;
+ 180   3                  rs485_4.RX_rcv_cnt++;
+ 181   3              }
+ 182   2              /* 6, 重置接收完毕判断时间                              */
+ 183   2              rs485_4.RX_rcv_timeout = 5;
+ 184   2          }
+ 185   1      }
+ 186          
+ 187          
+ 188          /**
+ 189           * @brief 串口5中断处理函数
+ 190           *
+ 191           * @param   
  192           *
- 193           * @param   
- 194           *
- 195           * @return  void
- 196          **/
- 197          void Uart5_TX_Isr() interrupt 12 
- 198          {   
- 199   1          /* 1, 检测到S4TI置1，即发送完毕                       */
- 200   1          if( SCON3T & S5TI )          //
- 201   1          {
- 202   2              /* 2, 软件将S4TI清零，等待发送标志位重置，可继续发送    */
- 203   2              SCON3T &= ~S5TI;     
- 204   2              /* 3, 依次将TX_buf中数据送出（写SBUF0操作即为发送）    */
- 205   2              if( rs485_5.TX_send_bytelength != 0 )
- 206   2              {
- 207   3                  SBUF3_TX = rs485_5.TX_buf[rs485_5.TX_send_cnt++];
- 208   3                  rs485_5.TX_send_bytelength--;
- 209   3              }else
- 210   2              {
- 211   3                  rs485_5.TX_send_cnt = 0;
- 212   3                  TR5 = 0;
- 213   3              }
- 214   2          }
- 215   1      }
- 216          
- 217          /**
- 218           * @brief 串口4中断处理函数
+ 193           * @return  void
+ 194          **/
+ 195          void Uart5_TX_Isr() interrupt 12 
+ 196          {   
+ 197   1          /* 1, 检测到S4TI置1，即发送完毕                       */
+ 198   1          if( SCON3T & S5TI )          //
+ 199   1          {
+ 200   2              /* 2, 软件将S4TI清零，等待发送标志位重置，可继续发送    */
+ 201   2              SCON3T &= ~S5TI;     
+ 202   2              /* 3, 依次将TX_buf中数据送出（写SBUF0操作即为发送）    */
+ 203   2              if( rs485_5.TX_send_bytelength != 0 )
+ 204   2              {
+ 205   3                  SBUF3_TX = rs485_5.TX_buf[rs485_5.TX_send_cnt++];
+ 206   3                  rs485_5.TX_send_bytelength--;
+ 207   3              }else
+ 208   2              {
+ 209   3                  rs485_5.TX_send_cnt = 0;
+ 210   3                  TR5 = 0;
+ 211   3              }
+ 212   2          }
+ 213   1      }
+ 214          
+ 215          /**
+ 216           * @brief 串口4中断处理函数
+ 217           *
+ 218           * @param   
  219           *
- 220           * @param   
- 221           *
- 222           * @return  void
- 223          **/
- 224          void Uart5_RX_Isr() interrupt 13 
- 225          {   
- 226   1              /* 1, 检测到S2RI置1，即接收完毕                       */
- 227   1          if( SCON3R & S5RI )
- 228   1          {
- 229   2              /* 2, 软件将S2RI清零，等待接收标志位重置，可继续发送    */
- 230   2              SCON3R &= ~S5RI; 
- 231   2      
- 232   2              /* 3, 判断数据包是否接收完毕                           */
- 233   2              if( !rs485_5.RX_rcv_end_Flag )
- 234   2              {
- 235   3                  /* 4, 数据包大于RX_buf 则从头计数                  */
- 236   3                  if( rs485_5.RX_rcv_cnt > 1024 )
- 237   3                  {
- 238   4                      rs485_5.RX_rcv_cnt = 0;
- 239   4                  }
-C51 COMPILER V9.60.7.0   COMMUNICATION                                                     10/16/2025 17:12:36 PAGE 5   
+ 220           * @return  void
+ 221          **/
+ 222          void Uart5_RX_Isr() interrupt 13 
+ 223          {   
+ 224   1              /* 1, 检测到S2RI置1，即接收完毕                       */
+ 225   1          if( SCON3R & S5RI )
+ 226   1          {
+ 227   2              /* 2, 软件将S2RI清零，等待接收标志位重置，可继续发送    */
+ 228   2              SCON3R &= ~S5RI; 
+ 229   2      
+ 230   2              /* 3, 判断数据包是否接收完毕                           */
+ 231   2              if( !rs485_5.RX_rcv_end_Flag )
+ 232   2              {
+ 233   3                  /* 4, 数据包大于RX_buf 则从头计数                  */
+ 234   3                  if( rs485_5.RX_rcv_cnt > 1024 )
+ 235   3                  {
+ 236   4                      rs485_5.RX_rcv_cnt = 0;
+ 237   4                  }
+ 238   3      
+ 239   3                  /* 5, 依次将RX_buf中数据接收（读S2BUF操作即为接收）*/
+C51 COMPILER V9.60.7.0   COMMUNICATION                                                     10/24/2025 16:55:10 PAGE 5   
 
- 240   3      
- 241   3                  /* 5, 依次将RX_buf中数据接收（读S2BUF操作即为接收）*/
- 242   3                  rs485_5.RX_buf[rs485_5.RX_rcv_cnt] = SBUF3_RX;
- 243   3                  rs485_5.RX_rcv_cnt++;
- 244   3              }
- 245   2              /* 6, 重置接收完毕判断时间                              */
- 246   2              rs485_5.RX_rcv_timeout = 5;
- 247   2          }
- 248   1      }
- 249          
- 250          void Tim1_Isr( void ) interrupt 3
- 251          {
- 252   1          TH1   = (uint8_t)(T0_PERIOD_1MS>>8);
- 253   1          TL1   = (uint8_t)T0_PERIOD_1MS;  
- 254   1      
- 255   1          /* 1, 如果接收未超时                                             */
- 256   1          if ( rs485_2.RX2_rev_timeout != 0 )  
- 257   1          {
- 258   2              rs485_2.RX2_rev_timeout--;
- 259   2              /* 2, 如果接收超时                                          */
- 260   2              if( rs485_2.RX2_rev_timeout == 0 )  
- 261   2              {
- 262   3                  if( rs485_2.RX2_rev_cnt > 0 )  
- 263   3                  {   
- 264   4                       /* 3, 接收完毕标志位亮起并初始化接收缓冲区         */
- 265   4                      rs485_2.RX2_rev_end_Flag = 1;    
- 266   4                  }
- 267   3              }
- 268   2          } 
- 269   1      
- 270   1          //     /* 1, 如果接收未超时                                             */
- 271   1          // if ( rs485_4.RX4_rev_timeout != 0 )  
- 272   1          // {
- 273   1          //     rs485_4.RX4_rev_timeout--;
- 274   1          //     /* 2, 如果接收超时                                          */
- 275   1          //     if( rs485_4.RX4_rev_timeout == 0 )  
- 276   1          //     {
- 277   1          //         if( rs485_4.RX4_rev_cnt > 0 )  
- 278   1          //         {   
- 279   1          //              /* 3, 接收完毕标志位亮起并初始化接收缓冲区         */
- 280   1          //             rs485_4.RX4_rev_end_Flag = 1;    
- 281   1          //         }
- 282   1          //     }
- 283   1          // } 
- 284   1      
- 285   1          /* 1, 如果接收未超时                                             */
- 286   1          if ( rs485_5.RX_rcv_timeout != 0 )  
- 287   1          {
- 288   2              rs485_5.RX_rcv_timeout--;
- 289   2              /* 2, 如果接收超时                                          */
- 290   2              if( rs485_5.RX_rcv_timeout == 0 )  
- 291   2              {
- 292   3                  if( rs485_5.RX_rcv_cnt > 0 )  
- 293   3                  {   
- 294   4                       /* 3, 接收完毕标志位亮起并初始化接收缓冲区         */
- 295   4                      rs485_5.RX_rcv_end_Flag = 1;    
- 296   4                  }
- 297   3              }
- 298   2          } 
- 299   1      }
- 300          
- 301          
-C51 COMPILER V9.60.7.0   COMMUNICATION                                                     10/16/2025 17:12:36 PAGE 6   
+ 240   3                  rs485_5.RX_buf[rs485_5.RX_rcv_cnt] = SBUF3_RX;
+ 241   3                  rs485_5.RX_rcv_cnt++;
+ 242   3              }
+ 243   2              /* 6, 重置接收完毕判断时间                              */
+ 244   2              rs485_5.RX_rcv_timeout = 5;
+ 245   2          }
+ 246   1      }
+ 247          
+ 248          void Tim1_Isr( void ) interrupt 3
+ 249          {
+ 250   1          TH1   = (uint8_t)(T0_PERIOD_1MS>>8);
+ 251   1          TL1   = (uint8_t)T0_PERIOD_1MS;  
+ 252   1      
+ 253   1          /* 1, 如果接收未超时                                             */
+ 254   1          if ( rs485_2.RX2_rev_timeout != 0 )  
+ 255   1          {
+ 256   2              rs485_2.RX2_rev_timeout--;
+ 257   2              /* 2, 如果接收超时                                          */
+ 258   2              if( rs485_2.RX2_rev_timeout == 0 )  
+ 259   2              {
+ 260   3                  if( rs485_2.RX2_rev_cnt > 0 )  
+ 261   3                  {   
+ 262   4                       /* 3, 接收完毕标志位亮起并初始化接收缓冲区         */
+ 263   4                      rs485_2.RX2_rev_end_Flag = 1;    
+ 264   4                  }
+ 265   3              }
+ 266   2          } 
+ 267   1      
+ 268   1              /* 1, 如果接收未超时                                             */
+ 269   1          if ( rs485_4.RX_rcv_timeout != 0 )  
+ 270   1          {
+ 271   2              rs485_4.RX_rcv_timeout--;
+ 272   2              /* 2, 如果接收超时                                          */
+ 273   2              if( rs485_4.RX_rcv_timeout == 0 )  
+ 274   2              {
+ 275   3                  if( rs485_4.RX_rcv_cnt > 0 )  
+ 276   3                  {   
+ 277   4                       /* 3, 接收完毕标志位亮起并初始化接收缓冲区         */
+ 278   4                      rs485_4.RX_rcv_end_Flag = 1;    
+ 279   4                  }
+ 280   3              }
+ 281   2          } 
+ 282   1      
+ 283   1          /* 1, 如果接收未超时                                             */
+ 284   1          if ( rs485_5.RX_rcv_timeout != 0 )  
+ 285   1          {
+ 286   2              rs485_5.RX_rcv_timeout--;
+ 287   2              /* 2, 如果接收超时                                          */
+ 288   2              if( rs485_5.RX_rcv_timeout == 0 )  
+ 289   2              {
+ 290   3                  if( rs485_5.RX_rcv_cnt > 0 )  
+ 291   3                  {   
+ 292   4                       /* 3, 接收完毕标志位亮起并初始化接收缓冲区         */
+ 293   4                      rs485_5.RX_rcv_end_Flag = 1;    
+ 294   4                  }
+ 295   3              }
+ 296   2          } 
+ 297   1      }
+ 298          
+ 299          
+ 300          // void uart4_send_byte( uint8_t byte )
+ 301          // {
+C51 COMPILER V9.60.7.0   COMMUNICATION                                                     10/24/2025 16:55:10 PAGE 6   
 
- 302          void uart4_send_byte( uint8_t byte )
- 303          {
- 304   1          SCON3T = 0;
- 305   1          SBUF2_TX = byte;
- 306   1          while (Busy4);
- 307   1          Busy4 = 1;
- 308   1          SCON3T = 0x80;
- 309   1      }
- 310          
- 311          void uart4_send_str( uint8_t *str,uint16_t len )
- 312          {
- 313   1          uint16_t i;
- 314   1      
- 315   1          for(i=0;i<len;i++)
- 316   1          {
- 317   2              uart4_send_byte(str[i]);
- 318   2          }
- 319   1      }
- 320          
- 321          char putchar(char c)
- 322          {
- 323   1          uart4_send_byte(c);
- 324   1          return c;
- 325   1      }
+ 302          //     SCON2T = 0;
+ 303          //     SBUF2_TX = byte;
+ 304          //     while (Busy4);
+ 305          //     Busy4 = 1;
+ 306          //     SCON2T = 0x80;
+ 307          // }
+ 308          
+ 309          // void uart4_send_str( uint8_t *str,uint16_t len )
+ 310          // {
+ 311          //     uint16_t i;
+ 312          
+ 313          //     for(i=0;i<len;i++)
+ 314          //     {
+ 315          //         uart4_send_byte(str[i]);
+ 316          //     }
+ 317          // }
+ 318          
+ 319          // char putchar(char c)
+ 320          // {
+ 321          //     uart4_send_byte(c);
+ 322          //     return c;
+ 323          // }
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =    642    ----
+   CODE SIZE        =    735    ----
    CONSTANT SIZE    =   ----    ----
-   XDATA SIZE       =   2582       5
+   XDATA SIZE       =   2582    ----
    PDATA SIZE       =   ----    ----
    DATA SIZE        =   ----    ----
    IDATA SIZE       =   ----    ----

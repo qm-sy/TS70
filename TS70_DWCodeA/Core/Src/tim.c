@@ -32,6 +32,7 @@ void Tim0_Isr( void ) interrupt 1
 {
     static uint8_t press_scan_cnt = 0;
     static uint16_t paoji_cnt = 0;
+    static uint16_t scan_03_cnt = 0;
 
     TH0   = (uint8_t)(T0_PERIOD_1MS>>8);
     TL0   = (uint8_t)T0_PERIOD_1MS;      
@@ -75,6 +76,19 @@ void Tim0_Isr( void ) interrupt 1
         hansen.paoji_send = 0;
         hansen.paoji_h = hansen.paoji_min = hansen.paoji_s = 0;
         paoji_cnt = 0;
+    }
+
+    if(( sp350.params_get_flag1 == 1 ) && ( sp350.params_get_flag2 == 0 ))
+    {
+        scan_03_cnt++;
+        if( scan_03_cnt == 200 )
+        {
+            sp350.params_get_flag2 = 1;
+            scan_03_cnt = 0;
+        }
+    }else
+    {
+        scan_03_cnt = 0;
     }
 }
 

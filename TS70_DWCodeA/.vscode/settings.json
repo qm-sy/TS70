@@ -8,6 +8,7 @@
         "uart.h": "c",
         "sys.h": "c",
         "eeprom_crl.h": "c",
-        "eeprom.h": "c"
+        "eeprom.h": "c",
+        "modbus.h": "c"
     }
 }

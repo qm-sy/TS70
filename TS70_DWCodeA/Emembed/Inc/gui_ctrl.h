@@ -4,24 +4,29 @@
 #include "sys.h"
 #include "modbus.h"
 
-#define ALARM_TEMP12_ADDR   0x00
-#define ALARM_TEMP3_ADDR    0x01
-#define FM_SWITCH_ADDR      0x02
-#define R_SWITCH_ADDR       0x03
-#define LED_SWITCH_ADDR     0x04
-#define FAN_ADDR            0x05
+#define F_AC_SWITCH         0X0000
+#define M_AC_SWITCH         0X0001
+#define R_AC_SWITCH         0X0002
+#define F_TEMP_ALARM        0X0003
+#define M_TEMP_ALARM        0X0004
+#define R_TEMP_ALARM        0X0005
+#define LED_ADDR            0x0006
+#define FAN_ADDR            0x0007
+#define FAN_SWITCH          0x0008
 
 typedef struct 
 {
-    uint16_t  alarm_tempF;       //数据包接收完毕标志
-    uint16_t  alarm_tempM;           //SBUF TI缓冲区
-    uint16_t  alarm_tempR;           //SBUF RI缓冲区
-    uint16_t  F_switch;    //发送字节数
-    uint16_t  M_switch;           //发送计数
-    uint16_t  R_switch;        //接收超时
-    uint16_t  LED_switch;            //接收计数
-    uint16_t  fan_switch;                //DR
-    uint16_t  fan_level;
+    uint8_t  F_alarm_val;       //数据包接收完毕标志
+    uint8_t  M_alarm_val;           //SBUF TI缓冲区
+    uint8_t  R_alarm_val;           //SBUF RI缓冲区
+    uint8_t  F_switch;    //发送字节数
+    uint8_t  M_switch;           //发送计数
+    uint8_t  R_switch;        //接收超时
+    uint8_t  LED_switch;            //接收计数
+    uint8_t  fan_switch;                //DR
+    uint8_t  fan_level;
+    uint8_t   params_get_flag1;
+    uint8_t   params_get_flag2;
 }SP350;
 
 typedef struct 

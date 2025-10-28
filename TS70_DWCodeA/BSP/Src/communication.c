@@ -32,14 +32,13 @@ void Uart2_Send_Statu_Init( void )
 **/
 void Uart4_Send_Statu_Init( void )
 {
-    rs485_4.RX4_rev_end_Flag = 0;
-    rs485_4.TX4_buf[128] = 0;
-    rs485_4.RX4_buf[128] = 0;
-    rs485_4.TX4_send_bytelength = 0;
-    rs485_4.TX4_send_cnt = 0;
-    rs485_4.RX4_rev_timeout = 0;
-    rs485_4.RX4_rev_cnt = 0;
-    //DR_485 = 0;
+    rs485_4.RX_rcv_end_Flag = 0;
+    rs485_4.TX_buf[128] = 0;
+    rs485_4.RX_buf[128] = 0;
+    rs485_4.TX_send_bytelength = 0;
+    rs485_4.TX_send_cnt = 0;
+    rs485_4.RX_rcv_timeout = 0;
+    rs485_4.RX_rcv_cnt = 0;
 }
 
 /**
@@ -58,7 +57,6 @@ void Uart5_Send_Statu_Init( void )
     rs485_5.TX_send_cnt = 0;
     rs485_5.RX_rcv_timeout = 0;
     rs485_5.RX_rcv_cnt = 0;
-    //DR_485 = 0;
 }
 
 /**
@@ -140,51 +138,51 @@ void Uart4_TX_Isr() interrupt 10
     {
         /* 2, 软件将S4TI清零，等待发送标志位重置，可继续发送    */
         SCON2T &= ~S4TI;    
-        Busy4 = 0;
-        /* 3, 依次将TX4_buf中数据送出（写SBUF0操作即为发送）    */
-        // if( rs485_4.TX4_send_bytelength != 0 )
-        // {
-        //     SBUF2_TX = rs485_4.TX4_buf[rs485_4.TX4_send_cnt++];
-        //     rs485_4.TX4_send_bytelength--;
-        // }else
-        // {
-        //     rs485_4.TX4_send_cnt = 0;
-        //     //DR_485 = 0;
-        // }
+        //Busy4 = 0;
+        /* 3, 依次将TX_buf中数据送出（写SBUF0操作即为发送）    */
+        if( rs485_4.TX_send_bytelength != 0 )
+        {
+            SBUF2_TX = rs485_4.TX_buf[rs485_4.TX_send_cnt++];
+            rs485_4.TX_send_bytelength--;
+        }else
+        {
+            rs485_4.TX_send_cnt = 0;
+            TR4 = 0;
+        }
     }
 }
 
-// /**
-//  * @brief	串口4中断处理函数
-//  *
-//  * @param   
-//  *
-//  * @return  void
-// **/
-// void Uart4_RX_Isr() interrupt 11 
-// {   
-//         /* 1, 检测到S2RI置1，即接收完毕                       */
-//     if( SCON2R & S4RI )
-//     {
-//         /* 2, 软件将S2RI清零，等待接收标志位重置，可继续发送    */
-//         SCON2R &= ~S4RI; 
-//         /* 3, 判断数据包是否接收完毕                           */
-//         if( !rs485_4.RX4_rev_end_Flag )
-//         {
-//             /* 4, 数据包大于RX_buf 则从头计数                  */
-//             if( rs485_4.RX4_rev_cnt > 128 )
-//             {
-//                 rs485_4.RX4_rev_cnt = 0;
-//             }
+/**
+ * @brief	串口4中断处理函数
+ *
+ * @param   
+ *
+ * @return  void
+**/
+void Uart4_RX_Isr() interrupt 11 
+{   
+        /* 1, 检测到S2RI置1，即接收完毕                       */
+    if( SCON2R & S4RI )
+    {
+        /* 2, 软件将S2RI清零，等待接收标志位重置，可继续发送    */
+        SCON2R &= ~S4RI; 
+        /* 3, 判断数据包是否接收完毕                           */
+        if( !rs485_4.RX_rcv_end_Flag )
+        {
+            /* 4, 数据包大于RX_buf 则从头计数                  */
+            if( rs485_4.RX_rcv_cnt > 128 )
+            {
+                rs485_4.RX_rcv_cnt = 0;
+            }
 
-//             /* 5, 依次将RX4_buf中数据接收（读S2BUF操作即为接收）*/
-//             rs485_4.RX4_buf[rs485_4.RX4_rev_cnt] = SBUF2_RX;
-//             rs485_4.RX4_rev_cnt++;
-//         }
-//         /* 6, 重置接收完毕判断时间                              */
-//         rs485_4.RX4_rev_timeout = 5;
-//     }
-// }
+            /* 5, 依次将RX_buf中数据接收（读S2BUF操作即为接收）*/
+            rs485_4.RX_buf[rs485_4.RX_rcv_cnt] = SBUF2_RX;
+            rs485_4.RX_rcv_cnt++;
+        }
+        /* 6, 重置接收完毕判断时间                              */
+        rs485_4.RX_rcv_timeout = 5;
+    }
+}
 
 
 /**
@@ -267,20 +265,20 @@ void Tim1_Isr( void ) interrupt 3
         }
     } 
 
-    //     /* 1, 如果接收未超时                                             */
-    // if ( rs485_4.RX4_rev_timeout != 0 )  
-    // {
-    //     rs485_4.RX4_rev_timeout--;
-    //     /* 2, 如果接收超时                                          */
-    //     if( rs485_4.RX4_rev_timeout == 0 )  
-    //     {
-    //         if( rs485_4.RX4_rev_cnt > 0 )  
-    //         {   
-    //              /* 3, 接收完毕标志位亮起并初始化接收缓冲区         */
-    //             rs485_4.RX4_rev_end_Flag = 1;    
-    //         }
-    //     }
-    // } 
+        /* 1, 如果接收未超时                                             */
+    if ( rs485_4.RX_rcv_timeout != 0 )  
+    {
+        rs485_4.RX_rcv_timeout--;
+        /* 2, 如果接收超时                                          */
+        if( rs485_4.RX_rcv_timeout == 0 )  
+        {
+            if( rs485_4.RX_rcv_cnt > 0 )  
+            {   
+                 /* 3, 接收完毕标志位亮起并初始化接收缓冲区         */
+                rs485_4.RX_rcv_end_Flag = 1;    
+            }
+        }
+    } 
 
     /* 1, 如果接收未超时                                             */
     if ( rs485_5.RX_rcv_timeout != 0 )  
@@ -299,27 +297,27 @@ void Tim1_Isr( void ) interrupt 3
 }
 
 
-void uart4_send_byte( uint8_t byte )
-{
-    SCON3T = 0;
-    SBUF2_TX = byte;
-    while (Busy4);
-    Busy4 = 1;
-    SCON3T = 0x80;
-}
+// void uart4_send_byte( uint8_t byte )
+// {
+//     SCON2T = 0;
+//     SBUF2_TX = byte;
+//     while (Busy4);
+//     Busy4 = 1;
+//     SCON2T = 0x80;
+// }
 
-void uart4_send_str( uint8_t *str,uint16_t len )
-{
-    uint16_t i;
+// void uart4_send_str( uint8_t *str,uint16_t len )
+// {
+//     uint16_t i;
 
-    for(i=0;i<len;i++)
-    {
-        uart4_send_byte(str[i]);
-    }
-}
+//     for(i=0;i<len;i++)
+//     {
+//         uart4_send_byte(str[i]);
+//     }
+// }
 
-char putchar(char c)
-{
-    uart4_send_byte(c);
-    return c;
-}
+// char putchar(char c)
+// {
+//     uart4_send_byte(c);
+//     return c;
+// }

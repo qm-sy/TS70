@@ -7,7 +7,7 @@
 #include "power_crl.h"
 #include "eeprom_crl.h"
 
-#define MY_ADDR     0xE2
+#define MY_ADDR     0x02
 
 typedef struct 
 {

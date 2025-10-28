@@ -24,13 +24,13 @@ typedef struct
 
 typedef struct 
 {
-    uint8_t     RX4_rev_end_Flag;       //数据包接收完毕标志
-    uint8_t     TX4_buf[128];           //SBUF TI缓冲区
-    uint8_t     RX4_buf[128];           //SBUF RI缓冲区
-    uint8_t     TX4_send_bytelength;    //发送字节数
-    uint8_t     TX4_send_cnt;           //发送计数
-    uint16_t    RX4_rev_timeout;        //接收超时
-    uint8_t     RX4_rev_cnt;            //接收计数
+    uint8_t     RX_rcv_end_Flag;       //数据包接收完毕标志
+    uint8_t     TX_buf[128];           //SBUF TI缓冲区
+    uint8_t     RX_buf[128];           //SBUF RI缓冲区
+    uint8_t     TX_send_bytelength;    //发送字节数
+    uint8_t     TX_send_cnt;           //发送计数
+    uint16_t    RX_rcv_timeout;        //接收超时
+    uint8_t     RX_rcv_cnt;            //接收计数
     
     uint8_t     DR_Flag;                //DR
 }RS485_4;
@@ -56,6 +56,5 @@ void Uart4_Send_Statu_Init( void );
 void Uart5_Send_Statu_Init( void );
 void uart4_send_byte( uint8_t byte );
 void uart4_send_str( uint8_t *str,uint16_t len );
-void press_scan( void );
 
 #endif

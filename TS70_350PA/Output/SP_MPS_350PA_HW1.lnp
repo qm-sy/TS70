@@ -1,0 +1,18 @@
+"..\Output\STARTUP.obj",
+"..\Output\delay.obj",
+"..\Output\adc.obj",
+"..\Output\gpio.obj",
+"..\Output\main.obj",
+"..\Output\pwm.obj",
+"..\Output\tim.obj",
+"..\Output\uart.obj",
+"..\Output\eeprom.obj",
+"..\Output\ntc.obj",
+"..\Output\power_crl.obj",
+"..\Output\communication.obj",
+"..\Output\eeprom_crl.obj",
+"..\Output\dht11.obj",
+"..\Output\modbus_rtu.obj",
+"..\Output\common.obj" 
+TO "..\Output\SP_MPS_350PA_HW1.12_SW001_20250514" 
+PRINT(".\Listings\SP_MPS_350PA_HW1.m51") RAMSIZE(256) 
