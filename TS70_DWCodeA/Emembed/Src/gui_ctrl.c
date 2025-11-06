@@ -250,19 +250,19 @@ void gui_vol_ctrl( uint16_t addr, uint8_t val_H, uint8_t val_L)
         /*          40001 …Ë÷√F_alarm_val(val_L) M_alarm_val(val_H)          */
         case 0x2010:
             sp350.F_alarm_val = val_L;
-            write_slave_06(F_TEMP_ALARM,0,sp350.F_alarm_val);  
+            write_slave_06_350P(F_TEMP_ALARM,0,sp350.F_alarm_val);  
 
             break;
         
         case 0x2011:
             sp350.M_alarm_val = val_L;
-            write_slave_06(M_TEMP_ALARM,0,sp350.M_alarm_val);    
+            write_slave_06_350P(M_TEMP_ALARM,0,sp350.M_alarm_val);    
 
             break;
 
         case 0x2012:
             sp350.R_alarm_val = val_L;
-            write_slave_06(R_TEMP_ALARM,0,sp350.R_alarm_val);  
+            write_slave_06_350P(R_TEMP_ALARM,0,sp350.R_alarm_val);  
             
             break;
 
@@ -270,37 +270,37 @@ void gui_vol_ctrl( uint16_t addr, uint8_t val_H, uint8_t val_L)
         /*          40002 …Ë÷√ F\M\R  Switch                                 */
         case 0x2013:
             sp350.F_switch = val_L;
-            write_slave_06(F_AC_SWITCH,0,sp350.F_switch);  
+            write_slave_06_350P(F_AC_SWITCH,0,sp350.F_switch);  
 
             break;
         
         case 0x2014:
             sp350.M_switch = val_L;
-            write_slave_06(M_AC_SWITCH,0,sp350.M_switch); 
+            write_slave_06_350P(M_AC_SWITCH,0,sp350.M_switch); 
 
             break;
 
         case 0x2015:
             sp350.R_switch = val_L;
-            write_slave_06(R_AC_SWITCH,0,sp350.R_switch); 
+            write_slave_06_350P(R_AC_SWITCH,0,sp350.R_switch); 
 
             break;
 
         case 0x2016:
             sp350.LED_switch = val_L;
-            write_slave_06(LED_ADDR,0,sp350.LED_switch); 
+            write_slave_06_350P(LED_ADDR,0,sp350.LED_switch); 
 
             break;
 
         case 0x2017:
             sp350.fan_level = val_L;
-            write_slave_06(FAN_ADDR,0,sp350.fan_level); 
+            write_slave_06_350P(FAN_ADDR,0,sp350.fan_level); 
 
             break; 
 
         case 0x2018:
             sp350.fan_switch = val_L;
-            write_slave_06(FAN_SWITCH,0,sp350.fan_switch); 
+            write_slave_06_350P(FAN_SWITCH,0,sp350.fan_switch); 
 
             break; 
 
@@ -317,7 +317,7 @@ void gui_vol_ctrl( uint16_t addr, uint8_t val_H, uint8_t val_L)
             break;
 
         case 0x2103:
-            write_slave_06_MC01(0x00,val_H,val_L);
+            write_slave_06_DFG(0x00,val_H,val_L);
             break;
 
         case 0x2104:
@@ -325,51 +325,51 @@ void gui_vol_ctrl( uint16_t addr, uint8_t val_H, uint8_t val_L)
             break;
 
         case 0x2105:
-            write_slave_06_MC01(0x01,val_H,val_L);
+            write_slave_06_DFG(0x01,val_H,val_L);
             break;
 
         case 0x2110:
-            write_slave_06_MC01(0x02,val_H,val_L);
+            write_slave_06_DFG(0x02,val_H,val_L);
             break;
 
         case 0x2111:
-            write_slave_06_MC01(0x03,val_H,val_L);
+            write_slave_06_DFG(0x03,val_H,val_L);
             break;
 
         case 0x2112:
-            write_slave_06_MC01(0x04,val_H,val_L);
+            write_slave_06_DFG(0x04,val_H,val_L);
             break;
 
         case 0x2113:
-            write_slave_06_MC01(0x05,val_H,val_L);
+            write_slave_06_DFG(0x05,val_H,val_L);
             break;
 
         case 0x2114:
-            write_slave_06_MC01(0x06,val_H,val_L);
+            write_slave_06_DFG(0x06,val_H,val_L);
             break;
 
         case 0x2115:
-            write_slave_06_MC01(0x07,val_H,val_L);
+            write_slave_06_DFG(0x07,val_H,val_L);
             break;
 
         case 0x2116:
-            write_slave_06_MC01(0x08,val_H,val_L);
+            write_slave_06_DFG(0x08,val_H,val_L);
             break;
 
         case 0x2117:
-            write_slave_06_MC01(0x09,val_H,val_L);
+            write_slave_06_DFG(0x09,val_H,val_L);
             break;
 
         case 0x2118:
-            write_slave_06_MC01(0x0a,val_H,val_L);
+            write_slave_06_DFG(0x0a,val_H,val_L);
             break;
 
         case 0x2119:
-            write_slave_06_MC01(0x0b,val_H,val_L);
+            write_slave_06_DFG(0x0b,val_H,val_L);
             break;
 
         case 0x211a:
-            write_slave_06_MC01(0x0c,val_H,val_L);
+            write_slave_06_DFG(0x0c,val_H,val_L);
             break;
         default:
             break;

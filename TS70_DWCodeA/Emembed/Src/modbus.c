@@ -5,7 +5,7 @@ MODBIS4_INFO modbus4;
 
 uint8_t fuyin_flag = 0;
 
-void Modbus_Event_Uart2( void )
+void Modbus_Event_DFG( void )
 {
     uint16_t crc,rccrc = 0;
 
@@ -30,23 +30,17 @@ void Modbus_Event_Uart2( void )
             {
                 switch ( rs485_2.rcv_buf[1] )
                 {
-                    case 0x03:
-                        Modbus_Fun03_DFG();
-                        break;  
-
-                    case 0x04:
-                        Modbus_Fun04_DFG();
-                        break;  
-
-                    default:
-                        break;
+                    case 0x03:          Modbus_Fun03_DFG();         break;  
+                    case 0x04:          Modbus_Fun04_DFG();         break;  
+                    case 0x06:          Modbus_Fun06_DFG();         break;  
+                    default:                                        break;
                 }
             }
         }
     }
 }
 
-void Modbus_Event_Uart4( void )
+void Modbus_Event_350P( void )
 {
     uint16_t crc,rccrc = 0;
 
@@ -71,19 +65,16 @@ void Modbus_Event_Uart4( void )
             {
                 switch ( rs485_4.RX_buf[1] )
                 {
-                    case FUN_03:        Modbus_Fun03_slave2();         break; 
+                    case FUN_03:            Modbus_Fun03_350P();            break; 
 
-                        break;  
-
-                    default:
-                        break;
+                    default:                                                break;
                 }
             }
         }
     }
 }
 
-void Modbus_Event_Uart5( void )
+void Modbus_Event_HanSen( void )
 {
     uint16_t crc,rccrc = 0;
 
@@ -102,13 +93,11 @@ void Modbus_Event_Uart5( void )
             {
                 switch ( rs485_5.RX_buf[1] )
                 {    
-                    case FUN_03:        Modbus_Fun03_slave1();         break; 
+                    case FUN_03:            Modbus_Fun03_HanSen();          break; 
+                    case FUN_06:            Modbus_Fun06_HanSen();          break; 
+                    case FUN_16:            Modbus_Fun16_HanSen();          break;  
 
-                    case FUN_06:        Modbus_Fun06_slave1();         break; 
-                        
-                    case FUN_16:        Modbus_Fun16_slave1();         break;  
-
-                    default:                                    break;
+                    default:                                                break;
                 }
             }
         }
@@ -220,8 +209,11 @@ void Modbus_Fun03_DFG( void )
     {
         mc01.params_get_flag1 = 0;
         mc01_parms_init();
+        Write_Dgusii_Vp_byChar(0x211b,"        ",8);
+        rs485_2.comm_error_flag2 = 0;
+        rs485_2.fun04_rcv_out = 1;
+        rs485_2.fun06_rcv_out = 1;
     }
-    
 }
 
 void Modbus_Fun04_DFG( void )
@@ -245,9 +237,17 @@ void Modbus_Fun04_DFG( void )
         }
         start_addr_04 += 2;
     }
+    rs485_2.fun04_rcv_out = 1;
 }
 
-void Modbus_Fun03_slave1( void )
+
+void Modbus_Fun06_DFG( void )
+{
+    rs485_2.fun06_rcv_out = 1;
+    rs485_2.press_flag2 = 0;
+}
+
+void Modbus_Fun03_HanSen( void )
 {
     uint16_t i;
 
@@ -356,7 +356,7 @@ void Modbus_Fun03_slave1( void )
     
 }
 
-void Modbus_Fun06_slave1( void )
+void Modbus_Fun06_HanSen( void )
 {
     switch(rs485_5.RX_buf[3])
     {
@@ -429,7 +429,7 @@ void Modbus_Fun06_slave1( void )
  *
  * @return  void 
 **/
-void Modbus_Fun16_slave1( void )
+void Modbus_Fun16_HanSen( void )
 {
     uint16_t i;
     static uint8_t chip_id[32] = {0};
@@ -1049,7 +1049,7 @@ void Modbus_Fun16_slave1( void )
 }
 
 
-void Modbus_Fun03_slave2( void )
+void Modbus_Fun03_350P( void )
 {
     uint16_t i = 0;
 
@@ -1136,7 +1136,7 @@ void Modbus_Fun03_slave2( void )
  *
  * @return  void
  */
-void write_slave_06(uint16_t reg_addr, uint8_t reg_val_H, uint8_t reg_val_L)
+void write_slave_06_350P(uint16_t reg_addr, uint8_t reg_val_H, uint8_t reg_val_L)
 {
     uint8_t send_buf[8];
     uint16_t crc;
@@ -1177,7 +1177,7 @@ void write_slave_06(uint16_t reg_addr, uint8_t reg_val_H, uint8_t reg_val_L)
  *
  * @return  void
  */
-void get_slave_03_350p( void )
+void read_slave_03_350P( void )
 {
     uint8_t send_buf[8];
     uint16_t crc;
@@ -1217,7 +1217,7 @@ void get_slave_03_350p( void )
  *
  * @return  void
  */
-void get_slave_03_MC01( void )
+void read_slave_03_DFG( void )
 {
     uint8_t send_buf[8];
     uint16_t crc;
@@ -1258,11 +1258,12 @@ void get_slave_03_MC01( void )
  *
  * @return  void
  */
-void get_slave_04_MC01( void )
+void read_slave_04_DFG( void )
 {
     uint8_t send_buf[8];
     uint16_t crc;
 
+    rs485_2.fun04_rcv_out = 0;
     download_flag = 0;
 
     send_buf[0] = DFJ_ADDR;     //Addr
@@ -1299,35 +1300,74 @@ void get_slave_04_MC01( void )
  *
  * @return  void
  */
-void write_slave_06_MC01(uint16_t reg_addr, uint8_t reg_val_H, uint8_t reg_val_L)
+void write_slave_06_DFG(uint16_t reg_addr, uint8_t reg_val_H, uint8_t reg_val_L)
 {
     uint8_t send_buf[8];
     uint16_t crc;
+    if( rs485_2.fun04_rcv_out == 1 )
+    {
+        download_flag = 0;
+        rs485_2.fun06_rcv_out = 0;
 
-    delay_ms(10);
-    download_flag = 0;
+        rs485_2.press_flag1 = rs485_2.press_flag2 = 1;
 
-    send_buf[0] = DFJ_ADDR;       //Addr
-    send_buf[1] = FUN_06;           //Fun
+        send_buf[0] = DFJ_ADDR;       //Addr
+        send_buf[1] = FUN_06;           //Fun
 
-    /*   Value_H  && Value_L    */
-    send_buf[2] = reg_addr >> 8;
-    send_buf[3] = reg_addr;
-    send_buf[4] = reg_val_H ;
-    send_buf[5] = reg_val_L;
+        /*   Value_H  && Value_L    */
+        send_buf[2] = reg_addr >> 8;
+        send_buf[3] = reg_addr;
+        send_buf[4] = reg_val_H ;
+        send_buf[5] = reg_val_L;
 
-    /*   crc    */
-    crc = MODBUS_CRC16(send_buf,6);
-    send_buf[6] = crc >> 8;
-    send_buf[7] = crc;
+        /*   crc    */
+        crc = MODBUS_CRC16(send_buf,6);
+        send_buf[6] = crc >> 8;
+        send_buf[7] = crc;
 
-    memcpy(rs485_2.send_buf,send_buf,8);
-    /*   发送，后使能接收    */
-    rs485_2.send_bytelength = 8;
+        memcpy(rs485_2.send_buf,send_buf,8);
+        /*   发送，后使能接收    */
+        rs485_2.send_bytelength = 8;
 
-    DR2_485 = 1;
-    TI0 = 1;
-    delay_ms(2);
+        DR2_485 = 1;
+        TI0 = 1;
+        delay_ms(2);
+        
+    }else
+    {
+        if(( rs485_2.comm_error_flag2 == 0 ) && (rs485_2.fun06_rcv_out == 1))
+        {
+            DR2_485 = 0;
+            rs485_2.fun04_rcv_out = 1;
+            rs485_2.press_flag1 = rs485_2.press_flag2 = 1;
+            delay_ms(20);
+            download_flag = 0;
+            rs485_2.fun06_rcv_out = 0;
+
+            send_buf[0] = DFJ_ADDR;       //Addr
+            send_buf[1] = FUN_06;           //Fun
+
+            /*   Value_H  && Value_L    */
+            send_buf[2] = reg_addr >> 8;
+            send_buf[3] = reg_addr;
+            send_buf[4] = reg_val_H ;
+            send_buf[5] = reg_val_L;
+
+            /*   crc    */
+            crc = MODBUS_CRC16(send_buf,6);
+            send_buf[6] = crc >> 8;
+            send_buf[7] = crc;
+
+            memcpy(rs485_2.send_buf,send_buf,8);
+            /*   发送，后使能接收    */
+            rs485_2.send_bytelength = 8;
+
+            DR2_485 = 1;
+            TI0 = 1;
+            delay_ms(2);
+        }
+        
+    }
 }
 
 /**

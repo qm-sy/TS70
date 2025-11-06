@@ -24,22 +24,28 @@ void main()
 	mc01.params_get_flag1 = 1;
 	mc01.params_get_flag2 = 1;
 	mc01.temp_scan_flag = 0;
+    rs485_2.comm_error_flag = 0;
+	rs485_2.comm_error_flag2 = 0;
+	rs485_2.fun06_rcv_out = 1;
+	rs485_2.fun04_rcv_out = 1;
+	rs485_2.press_flag1 = 0;
+	rs485_2.press_flag2 = 0;
 	delay_ms(200);
 
 	diwen_parms_init();
 
-	EA    = 1;              //æ€»ä¸­æ–­å¼€å…³
+	EA    = 1;              //×ÜÖĞ¶Ï¿ª¹Ø
 	
 	// printf(" ===== code start ====== \r\n");
 	
 	while(1)
 	{
-		uart_frame_deal();			//ä¸²å£ç¨‹åºä¸‹è½½
-		Modbus_Event_Uart2();
-		Modbus_Event_Uart4();
-		Modbus_Event_Uart5();
+		uart_frame_deal();			//´®¿Ú³ÌĞòÏÂÔØ
+		Modbus_Event_DFG();
+		Modbus_Event_350P();
+		Modbus_Event_HanSen();
 
-		if( gui_scan_flag == 1 )		//50msæ£€æµ‹ä¸€æ¬¡å±å¹•æ˜¯å¦è¢«æŒ‰ä¸‹
+		if( gui_scan_flag == 1 )		//50ms¼ì²âÒ»´ÎÆÁÄ»ÊÇ·ñ±»°´ÏÂ
 		{
 			Sw_Data_Send();
 			gui_scan_flag = 0;
@@ -54,18 +60,33 @@ void main()
 		}
 		if( sp350.params_get_flag2 == 1 )
 		{
-			get_slave_03_350p();
+			read_slave_03_350P();
 			sp350.params_get_flag2 = 0;
 		}
 		if( mc01.params_get_flag2 == 1 )
 		{
-			get_slave_03_MC01();
+			read_slave_03_DFG();
 			mc01.params_get_flag2 = 0;
 		}
 		if(( mc01.params_get_flag1 == 0 ) && ( mc01.temp_scan_flag == 1 ))
 		{
-			get_slave_04_MC01();
+			if(( rs485_2.fun06_rcv_out == 1 ) && (rs485_2.fun06_rcv_out == 1))
+			{
+				if( rs485_2.press_flag1 == 0 )
+				{
+					read_slave_04_DFG();
+				}
+			}
+
 			mc01.temp_scan_flag = 0;
+		}
+		if( rs485_2.comm_error_flag == 1 )
+		{
+			mc01.params_get_flag1 = 1;
+			mc01.params_get_flag2 = 1;
+			rs485_2.comm_error_flag = 0;
+			rs485_2.comm_error_flag2 = 1;
+			Write_Dgusii_Vp_byChar(0x211b,"Í¨Ñ¶Ê§°Ü",8);
 		}
 	}
 }

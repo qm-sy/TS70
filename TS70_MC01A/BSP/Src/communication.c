@@ -71,7 +71,7 @@ void Uart4_ISR() interrupt 18
             rs485_4.rcv_cnt++;
         }
         /* 6, 重置接收完毕判断时间                              */
-        rs485_4.rcv_timeout = 20;
+        rs485_4.rcv_timeout = 10;
     }
 }
 

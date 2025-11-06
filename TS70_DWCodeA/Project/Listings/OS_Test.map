@@ -124,7 +124,7 @@ START     STOP      LENGTH    ALIGN  RELOC    MEMORY CLASS   SEGMENT NAME
 000AB8H   000B24H   00006DH   BYTE   UNIT     CODE           ?PR?TIM1_ISR?COMMUNICATION
 000B25H   000B8EH   00006AH   BYTE   UNIT     CODE           ?PR?_MODBUS_CRC16?MODBUS
 000B8FH   000BEDH   00005FH   BYTE   UNIT     CODE           ?PR?UART2_RXTX_ISR?UART
-000BEEH   000C43H   000056H   BYTE   UNIT     CODE           ?PR?MODBUS_EVENT_UART2?MODBUS
+000BEEH   000C43H   000056H   BYTE   UNIT     CODE           ?PR?Modbus_Event_DFG?MODBUS
 000C44H   000C95H   000052H   BYTE   UNIT     CODE           ?PR?_WRITE_DGUS?SYS
 000C96H   000CDEH   000049H   BYTE   UNIT     CODE           ?PR?UART4_RX_ISR?COMMUNICATION
 000CDFH   000D23H   000045H   BYTE   UNIT     CODE           ?PR?UART4_TX_ISR?COMMUNICATION
@@ -132,7 +132,7 @@ START     STOP      LENGTH    ALIGN  RELOC    MEMORY CLASS   SEGMENT NAME
 000D5BH   000D88H   00002EH   BYTE   UNIT     CODE           ?PR?_DELAY_MS?SYS
 000D89H   000DB3H   00002BH   BYTE   UNIT     CODE           ?PR?MAIN?MAIN
 000DB4H   000DDCH   000029H   BYTE   UNIT     CODE           ?PR?SYS_CPU_INIT?SYS
-000DDDH   000DF8H   00001CH   BYTE   UNIT     CODE           ?PR?Modbus_Fun06_slave1?MODBUS
+000DDDH   000DF8H   00001CH   BYTE   UNIT     CODE           ?PR?Modbus_Fun06_HanSen?MODBUS
 000DF9H   000E12H   00001AH   BYTE   UNIT     CODE           ?C_INITSEG
 000E13H   000E29H   000017H   BYTE   UNIT     CODE           ?PR?UART2_SEND_STATU_INIT?COMMUNICATION
 LX51 LINKER/LOCATER V4.66.100.0                                                       08/24/2025  22:43:58  PAGE 3
@@ -158,7 +158,7 @@ START     STOP      LENGTH    ALIGN  RELOC    MEMORY CLASS   SEGMENT NAME
    *DEL*:           00012CH   BYTE   UNIT     CODE           ?PR?_SYS_WRITE_VP?SYS
    *DEL*:           000007H   BYTE   UNIT     XDATA          ?XD?_SYS_WRITE_VP?SYS
    *DEL*:           000004H   BYTE   UNIT     DATA           ?DT?_DELAY_US?SYS
-   *DEL*:           000058H   BYTE   UNIT     CODE           ?PR?MODBUS_EVENT_UART4?MODBUS
+   *DEL*:           000058H   BYTE   UNIT     CODE           ?PR?Modbus_Event_350P?MODBUS
 
 
 
@@ -208,7 +208,7 @@ MAIN/MAIN                                ----- -----  ----- -----  ----- -----
 
   +--> _DELAY_MS/SYS
   +--> UART_FRAME_DEAL/UART
-  +--> MODBUS_EVENT_UART2/MODBUS
+  +--> Modbus_Event_DFG/MODBUS
 
 SYS_INIT/SYS                             ----- -----  ----- -----  ----- -----
   +--> SYS_CPU_INIT/SYS
@@ -254,13 +254,13 @@ _DEAL_83_CMD/UART                        ----- -----  ----- -----  8B1AH 8B21H
 
 _SYS_READ_VP/SYS                         ----- -----  ----- -----  8B22H 8B28H
 
-MODBUS_EVENT_UART2/MODBUS                ----- -----  ----- -----  ----- -----
+Modbus_Event_DFG/MODBUS                ----- -----  ----- -----  ----- -----
   +--> _MODBUS_CRC16/MODBUS
-  +--> Modbus_Fun06_slave1/MODBUS
+  +--> Modbus_Fun06_HanSen/MODBUS
 
 _MODBUS_CRC16/MODBUS                     ----- -----  ----- -----  8A12H 8A14H
 
-Modbus_Fun06_slave1/MODBUS                       ----- -----  ----- -----  ----- -----
+Modbus_Fun06_HanSen/MODBUS                       ----- -----  ----- -----  ----- -----
 
 ?C_INITSEG                               ----- -----  ----- -----  ----- -----
 
@@ -386,9 +386,9 @@ PUBLIC SYMBOLS OF MODULE:  ..\Output\OS_Test (MAIN)
 *SFR* 00000090H.7 DATA     BIT       LED
 *SFR* 000000E5H   DATA     BYTE      MAC_MODE
       01000D89H   CODE     ---       main
-      01000BEEH   CODE     ---       Modbus_Event_Uart2
-*DEL*:00000000H   CODE     ---       Modbus_Event_Uart4
-      01000DDDH   CODE     ---       Modbus_Fun06_slave1
+      01000BEEH   CODE     ---       Modbus_Event_DFG
+*DEL*:00000000H   CODE     ---       Modbus_Event_350P
+      01000DDDH   CODE     ---       Modbus_Fun06_HanSen
 *SFR* 000000C9H   DATA     BYTE      MUX_SEL
 *SFR* 000000D0H.2 DATA     BIT       OV
 *SFR* 000000D0H.0 DATA     BIT       P
@@ -1798,8 +1798,8 @@ SYMBOL TABLE OF MODULE:  ..\Output\OS_Test (MAIN)
 
       ---         MODULE    ---      ---       MODBUS
       01000B2BH   PUBLIC    CODE     ---       _MODBUS_CRC16
-      01000DDDH   PUBLIC    CODE     ---       Modbus_Fun06_slave1
-      01000BEEH   PUBLIC    CODE     ---       Modbus_Event_Uart2
+      01000DDDH   PUBLIC    CODE     ---       Modbus_Fun06_HanSen
+      01000BEEH   PUBLIC    CODE     ---       Modbus_Event_DFG
       000000F1H   SFRSYM    DATA     BYTE      ADR_H
       00000080H   SFRSYM    DATA     BYTE      P0
       00000090H   SFRSYM    DATA     BYTE      P1

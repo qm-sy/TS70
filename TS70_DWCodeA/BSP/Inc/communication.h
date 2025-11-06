@@ -19,6 +19,13 @@ typedef struct
     uint8_t     send_cnt;           //发送计数
     uint16_t    rcv_timeout;        //接收超时
     uint8_t     rcv_cnt;            //接收计数
+
+    uint8_t     fun04_rcv_out;
+    uint8_t     fun06_rcv_out;
+    uint8_t     comm_error_flag;
+    uint8_t     comm_error_flag2;
+    uint8_t     press_flag1;
+    uint8_t     press_flag2;
 }RS485_2;
 
 typedef struct 

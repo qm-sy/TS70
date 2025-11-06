@@ -35,6 +35,9 @@ void Tim0_Isr( void ) interrupt 1
     static uint8_t press_scan_cnt = 0;
     static uint16_t paoji_cnt = 0;
     static uint16_t temp_scan_cnt = 0;
+    static uint16_t send04_cnt = 0;
+    static uint16_t send06_cnt = 0;
+    static uint16_t press_cnt = 0;
 
     TH0   = (uint8_t)(T0_PERIOD_1MS>>8);
     TL0   = (uint8_t)T0_PERIOD_1MS;      
@@ -115,9 +118,50 @@ void Tim0_Isr( void ) interrupt 1
             mc01.temp_scan_flag = 1;
             temp_scan_cnt = 0;
         }
-    }else
+    }
+    if(( temp_scan_cnt >= 1000 ) || ( temp_scan_cnt < 0 ))
     {
         temp_scan_cnt = 0;
+    }
+
+    if(( rs485_2.fun06_rcv_out == 0 ) && ( rs485_2.comm_error_flag == 0))
+    {
+        send06_cnt++;
+        if( send06_cnt == 500 )
+        {
+            rs485_2.comm_error_flag = 1;
+            rs485_2.fun04_rcv_out   = 0;
+            send06_cnt = 0;
+        }
+    }else
+    {
+        send06_cnt = 0;
+    }
+
+    if(( rs485_2.fun04_rcv_out == 0 ) && ( rs485_2.comm_error_flag == 0))
+    {
+        send04_cnt++;
+        if( send04_cnt == 500 )
+        {
+            rs485_2.comm_error_flag = 1;
+            rs485_2.fun06_rcv_out   = 0;
+            send04_cnt = 0;
+        }
+    }else
+    {
+        send04_cnt = 0;
+    }
+
+    if(( rs485_2.press_flag1 == 1 ) && ( rs485_2.press_flag2 == 0 ))
+    {
+        press_cnt++;
+        if( press_cnt == 3000 )
+        {
+            rs485_2.press_flag1 = 0;
+        }
+    }else
+    {
+        press_cnt = 0;
     }
 }
 

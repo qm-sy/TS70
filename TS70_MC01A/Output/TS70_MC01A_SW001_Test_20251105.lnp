@@ -1,0 +1,15 @@
+"..\Output\delay.obj",
+"..\Output\adc.obj",
+"..\Output\eeprom.obj",
+"..\Output\gpio.obj",
+"..\Output\main.obj",
+"..\Output\tim.obj",
+"..\Output\uart.obj",
+"..\Output\communication.obj",
+"..\Output\eeprom_crl.obj",
+"..\Output\ntc.obj",
+"..\Output\power_crl.obj",
+"..\Output\common.obj",
+"..\Output\modbus_rtu.obj" 
+TO "..\Output\TS70_MC01A_SW001_Test_20251105" 
+PRINT(".\Listings\TS70_MC01A_SW001_Test_20251105.m51") RAMSIZE(256) 
