@@ -99,7 +99,7 @@ LINK MAP OF MODULE:  ..\Output\KP_SD_QDC01B_HW1.74_SW001_20250514 (DELAY)
             CODE    0FBDH     006EH     UNIT         ?PR?Modbus_Event?MODBUS_RTU
             CODE    102BH     0064H     UNIT         ?PR?READ_DHT11?DHT11
             CODE    108FH     0064H     UNIT         ?PR?_MODBUS_CRC16?MODBUS_RTU
-            CODE    10F3H     0061H     UNIT         ?PR?_GET_TEMP?NTC
+            CODE    10F3H     0061H     UNIT         ?PR?_get_adc?NTC
             CODE    1154H     0059H     UNIT         ?PR?TIM1_ISR?POWER_CRL
             CODE    11ADH     0054H     UNIT         ?PR?_MODE_CTRL?POWER_CRL
             CODE    1201H     004EH     UNIT         ?PR?_AC_CHANNEL_CTRL?POWER_CRL
@@ -263,10 +263,10 @@ SEGMENT                                            BIT_GROUP          DATA_GROUP
   +--> ?PR?EEPROM_DATA_RECORD?EEPROM_CRL
 
 ?PR?TEMP_SCAN?POWER_CRL                         -----    -----      -----    -----      -----    -----
-  +--> ?PR?_GET_TEMP?NTC
+  +--> ?PR?_get_adc?NTC
   +--> ?PR?READ_DHT11?DHT11
 
-?PR?_GET_TEMP?NTC                               -----    -----      -----    -----      0208H    0004H
+?PR?_get_adc?NTC                               -----    -----      -----    -----      0208H    0004H
   +--> ?PR?_GET_ADC_12BIT?ADC
   +--> ?PR?_LOOKUPTABLE?NTC
 
@@ -1067,7 +1067,7 @@ SYMBOL TABLE OF MODULE:  ..\Output\KP_SD_QDC01B_HW1.74_SW001_20250514 (DELAY)
   D:0088H         PUBLIC        TCON
   X:0108H         PUBLIC        temp
   X:010CH         SYMBOL        MF52E_tab
-  C:10F3H         PUBLIC        _get_temp
+  C:10F3H         PUBLIC        _get_adc
   C:0C48H         SYMBOL        _LookupTable
   D:00D0H         PUBLIC        PSW
   -------         PROC          TEMP_INIT
@@ -1102,7 +1102,7 @@ SYMBOL TABLE OF MODULE:  ..\Output\KP_SD_QDC01B_HW1.74_SW001_20250514 (DELAY)
   C:0CE3H         LINE#         65
   C:0CEBH         LINE#         66
   -------         ENDPROC       _LOOKUPTABLE
-  -------         PROC          _GET_TEMP
+  -------         PROC          _get_adc
   X:0208H         SYMBOL        channle_x
   -------         DO            
   X:0209H         SYMBOL        t
@@ -1118,7 +1118,7 @@ SYMBOL TABLE OF MODULE:  ..\Output\KP_SD_QDC01B_HW1.74_SW001_20250514 (DELAY)
   C:1117H         LINE#         87
   C:1123H         LINE#         88
   C:113AH         LINE#         91
-  -------         ENDPROC       _GET_TEMP
+  -------         ENDPROC       _get_adc
   -------         ENDMOD        NTC
 
   -------         MODULE        POWER_CRL

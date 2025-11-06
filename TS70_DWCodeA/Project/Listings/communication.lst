@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.7.0   COMMUNICATION                                                     10/24/2025 16:55:10 PAGE 1   
+C51 COMPILER V9.60.7.0   COMMUNICATION                                                     11/06/2025 19:53:03 PAGE 1   
 
 
 C51 COMPILER V9.60.7.0, COMPILATION OF MODULE COMMUNICATION
@@ -24,13 +24,13 @@ line level    source
   13          **/
   14          void Uart2_Send_Statu_Init( void )
   15          {
-  16   1          rs485_2.RX2_rev_end_Flag = 0;
-  17   1          rs485_2.TX2_buf[128] = 0;
-  18   1          rs485_2.RX2_buf[128] = 0;
-  19   1          rs485_2.TX2_send_bytelength = 0;
-  20   1          rs485_2.TX2_send_cnt = 0;
-  21   1          rs485_2.RX2_rev_timeout = 0;
-  22   1          rs485_2.RX2_rev_cnt = 0;
+  16   1          rs485_2.rcv_end_flag = 0;
+  17   1          rs485_2.send_buf[128] = 0;
+  18   1          rs485_2.rcv_buf[128] = 0;
+  19   1          rs485_2.send_bytelength = 0;
+  20   1          rs485_2.send_cnt = 0;
+  21   1          rs485_2.rcv_timeout = 0;
+  22   1          rs485_2.rcv_cnt = 0;
   23   1          //DR_485 = 0;
   24   1      }
   25          
@@ -62,7 +62,7 @@ line level    source
   51          void Uart5_Send_Statu_Init( void )
   52          {
   53   1          rs485_5.RX_rcv_end_Flag = 0;
-C51 COMPILER V9.60.7.0   COMMUNICATION                                                     10/24/2025 16:55:10 PAGE 2   
+C51 COMPILER V9.60.7.0   COMMUNICATION                                                     11/06/2025 19:53:03 PAGE 2   
 
   54   1          rs485_5.TX_buf[1024] = 0;
   55   1          rs485_5.RX_buf[1024] = 0;
@@ -88,17 +88,17 @@ line level    source
   75   2              /* 2, 软件将S4TI清零，等待发送标志位重置，可继续发送    */
   76   2              TI0 = 0;    
   77   2              Busy2 = 0;   
-  78   2              /* 3, 依次将TX2_buf中数据送出（写SBUF0操作即为发送）    */
+  78   2              /* 3, 依次将send_buf中数据送出（写SBUF0操作即为发送）    */
   79   2              if( download_flag == 0 )
   80   2              {
-  81   3                  if( rs485_2.TX2_send_bytelength != 0 )
+  81   3                  if( rs485_2.send_bytelength != 0 )
   82   3                  {
-  83   4                      SBUF0 = rs485_2.TX2_buf[rs485_2.TX2_send_cnt++];
-  84   4                      rs485_2.TX2_send_bytelength--;
+  83   4                      SBUF0 = rs485_2.send_buf[rs485_2.send_cnt++];
+  84   4                      rs485_2.send_bytelength--;
   85   4                  }else
   86   3                  {
-  87   4                      rs485_2.TX2_send_cnt = 0;
-  88   4                      //DR_485 = 0;
+  87   4                      rs485_2.send_cnt = 0;
+  88   4                      DR2_485 = 0;
   89   4                  }
   90   3              }
   91   2          }
@@ -118,22 +118,22 @@ line level    source
  105   2          T_O2=5; 
  106   2              
  107   2              /* 3, 判断数据包是否接收完毕                           */
- 108   2              if( !rs485_2.RX2_rev_end_Flag )
+ 108   2              if( !rs485_2.rcv_end_flag )
  109   2              {
  110   3                  /* 4, 数据包大于RX_buf 则从头计数                  */
- 111   3                  if( rs485_2.RX2_rev_cnt > 128 )
+ 111   3                  if( rs485_2.rcv_cnt > 128 )
  112   3                  {
- 113   4                      rs485_2.RX2_rev_cnt = 0;
+ 113   4                      rs485_2.rcv_cnt = 0;
  114   4                  }
  115   3      
-C51 COMPILER V9.60.7.0   COMMUNICATION                                                     10/24/2025 16:55:10 PAGE 3   
+C51 COMPILER V9.60.7.0   COMMUNICATION                                                     11/06/2025 19:53:03 PAGE 3   
 
- 116   3                  /* 5, 依次将RX2_buf中数据接收（读S2BUF操作即为接收）*/
- 117   3                  rs485_2.RX2_buf[rs485_2.RX2_rev_cnt] = SBUF0;
- 118   3                  rs485_2.RX2_rev_cnt++;
+ 116   3                  /* 5, 依次将rcv_buf中数据接收（读S2BUF操作即为接收）*/
+ 117   3                  rs485_2.rcv_buf[rs485_2.rcv_cnt] = SBUF0;
+ 118   3                  rs485_2.rcv_cnt++;
  119   3              }
  120   2              /* 6, 重置接收完毕判断时间                              */
- 121   2              rs485_2.RX2_rev_timeout = 5;
+ 121   2              rs485_2.rcv_timeout = 5;
  122   2          }
  123   1      
  124   1      }
@@ -190,7 +190,7 @@ line level    source
  175   4                      rs485_4.RX_rcv_cnt = 0;
  176   4                  }
  177   3      
-C51 COMPILER V9.60.7.0   COMMUNICATION                                                     10/24/2025 16:55:10 PAGE 4   
+C51 COMPILER V9.60.7.0   COMMUNICATION                                                     11/06/2025 19:53:03 PAGE 4   
 
  178   3                  /* 5, 依次将RX_buf中数据接收（读S2BUF操作即为接收）*/
  179   3                  rs485_4.RX_buf[rs485_4.RX_rcv_cnt] = SBUF2_RX;
@@ -254,7 +254,7 @@ line level    source
  237   4                  }
  238   3      
  239   3                  /* 5, 依次将RX_buf中数据接收（读S2BUF操作即为接收）*/
-C51 COMPILER V9.60.7.0   COMMUNICATION                                                     10/24/2025 16:55:10 PAGE 5   
+C51 COMPILER V9.60.7.0   COMMUNICATION                                                     11/06/2025 19:53:03 PAGE 5   
 
  240   3                  rs485_5.RX_buf[rs485_5.RX_rcv_cnt] = SBUF3_RX;
  241   3                  rs485_5.RX_rcv_cnt++;
@@ -270,16 +270,16 @@ line level    source
  251   1          TL1   = (uint8_t)T0_PERIOD_1MS;  
  252   1      
  253   1          /* 1, 如果接收未超时                                             */
- 254   1          if ( rs485_2.RX2_rev_timeout != 0 )  
+ 254   1          if ( rs485_2.rcv_timeout != 0 )  
  255   1          {
- 256   2              rs485_2.RX2_rev_timeout--;
+ 256   2              rs485_2.rcv_timeout--;
  257   2              /* 2, 如果接收超时                                          */
- 258   2              if( rs485_2.RX2_rev_timeout == 0 )  
+ 258   2              if( rs485_2.rcv_timeout == 0 )  
  259   2              {
- 260   3                  if( rs485_2.RX2_rev_cnt > 0 )  
+ 260   3                  if( rs485_2.rcv_cnt > 0 )  
  261   3                  {   
  262   4                       /* 3, 接收完毕标志位亮起并初始化接收缓冲区         */
- 263   4                      rs485_2.RX2_rev_end_Flag = 1;    
+ 263   4                      rs485_2.rcv_end_flag = 1;    
  264   4                  }
  265   3              }
  266   2          } 
@@ -318,7 +318,7 @@ line level    source
  299          
  300          // void uart4_send_byte( uint8_t byte )
  301          // {
-C51 COMPILER V9.60.7.0   COMMUNICATION                                                     10/24/2025 16:55:10 PAGE 6   
+C51 COMPILER V9.60.7.0   COMMUNICATION                                                     11/06/2025 19:53:03 PAGE 6   
 
  302          //     SCON2T = 0;
  303          //     SBUF2_TX = byte;
@@ -345,9 +345,9 @@ line level    source
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =    735    ----
+   CODE SIZE        =    737    ----
    CONSTANT SIZE    =   ----    ----
-   XDATA SIZE       =   2582    ----
+   XDATA SIZE       =   2579    ----
    PDATA SIZE       =   ----    ----
    DATA SIZE        =   ----    ----
    IDATA SIZE       =   ----    ----

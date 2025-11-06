@@ -10,28 +10,32 @@ void Modbus_Event_Uart2( void )
     uint16_t crc,rccrc = 0;
 
     /*1.接收完毕                                           */
-    if( rs485_2.RX2_rev_end_Flag == 1 )
+    if( rs485_2.rcv_end_flag == 1 )
     {
         /*2.清空接收完毕标志位                              */    
-        rs485_2.RX2_rev_end_Flag = 0;
+        rs485_2.rcv_end_flag = 0;
 
         /*3.CRC校验                                         */
-        crc = MODBUS_CRC16(rs485_2.RX2_buf, rs485_2.RX2_rev_cnt-2);
-        rccrc = (rs485_2.RX2_buf[rs485_2.RX2_rev_cnt-1]) | (rs485_2.RX2_buf[rs485_2.RX2_rev_cnt-2]<<8);
+        crc = MODBUS_CRC16(rs485_2.rcv_buf, rs485_2.rcv_cnt-2);
+        rccrc = (rs485_2.rcv_buf[rs485_2.rcv_cnt-1]) | (rs485_2.rcv_buf[rs485_2.rcv_cnt-2]<<8);
 
         /*4.清空接收计数                                    */
-        rs485_2.RX2_rev_cnt = 0; 
+        rs485_2.rcv_cnt = 0; 
 
         /*5.CRC校验通过，进行地址域校验                      */
         if( crc == rccrc )
         {  
             /*6.地址域校验通过，进入相应功能函数进行处理      */
-            if( rs485_2.RX2_buf[0] == 0x01 )    
+            if( rs485_2.rcv_buf[0] == DFJ_ADDR )    
             {
-                switch ( rs485_2.RX2_buf[1] )
+                switch ( rs485_2.rcv_buf[1] )
                 {
-                    case 0x06:
-                        // printf("uart2 is ok \r\n");
+                    case 0x03:
+                        Modbus_Fun03_DFG();
+                        break;  
+
+                    case 0x04:
+                        Modbus_Fun04_DFG();
                         break;  
 
                     default:
@@ -112,6 +116,134 @@ void Modbus_Event_Uart5( void )
         rs485_5.RX_rcv_cnt = 0; 
         /*6.清空接收完毕标志位                              */    
         rs485_5.RX_rcv_end_Flag = 0;
+    }
+}
+
+void Modbus_Fun03_DFG( void )
+{
+    uint16_t i = 0;
+
+    uint8_t start_addr_03 = 3;              //Slave reply  DATA1_H address
+
+    for( i = 0; i < 13; i++)
+    {
+        switch (i)
+        {            
+            /*  40001   后烘干开关                   */
+            case 0x00:
+                mc01.PostDry_switch    = rs485_2.rcv_buf[start_addr_03 + 1];   
+
+                break;
+
+            /*  40002   后烘干加热温度                   */
+            case 0x01:
+                mc01.PostDry_temp = rs485_2.rcv_buf[start_addr_03 + 1];   
+
+                break; 
+
+            /*  40003   撒粉开关及方向                   */
+            case 0x02:
+                mc01.SF_direction = rs485_2.rcv_buf[start_addr_03];   
+                mc01.SF_switch    = rs485_2.rcv_buf[start_addr_03 + 1];   
+
+                break;
+
+            /*  40004   撒粉功率                   */
+            case 0x03:
+                mc01.SF_level = rs485_2.rcv_buf[start_addr_03 + 1];   
+
+                break; 
+
+            /*  40005   抖粉开关及方向                */
+            case 0x04:
+                mc01.DF_direction = rs485_2.rcv_buf[start_addr_03];   
+                mc01.DF_switch    = rs485_2.rcv_buf[start_addr_03 + 1];   
+
+                break;
+
+            /*  40006   抖粉功率              */
+            case 0x05:
+                mc01.DF_level = rs485_2.rcv_buf[start_addr_03 + 1];   
+
+                break;   
+
+            /*  40007   吸风开关              */
+            case 0x06:
+                mc01.IW2_switch = rs485_2.rcv_buf[start_addr_03];  
+                mc01.IW1_switch = rs485_2.rcv_buf[start_addr_03 + 1];   
+
+                break;   
+
+            /*  40008   冷风开关              */
+            case 0x07:
+                mc01.CW_switch = rs485_2.rcv_buf[start_addr_03 + 1];   
+
+                break; 
+
+            /*  40009   收料开关              */
+            case 0x08:
+                mc01.MR_switch = rs485_2.rcv_buf[start_addr_03 + 1];   
+
+                break; 
+
+            /*  40010   保温开关               */
+            case 0x09:
+                mc01.Insulation_switch = rs485_2.rcv_buf[start_addr_03 + 1];   
+
+                break; 
+
+            /*  40011   保温温度              */
+            case 0x0a:
+                mc01.Insulation_temp = rs485_2.rcv_buf[start_addr_03 + 1];   
+
+                break; 
+
+            /*  40012   同步开关              */
+            case 0x0b:
+                mc01.sync_switch = rs485_2.rcv_buf[start_addr_03 + 1];   
+
+                break; 
+
+            /*  40013   总开关               */
+            case 0x0c:
+                mc01.power_switch = rs485_2.rcv_buf[start_addr_03 + 1];   
+
+                break; 
+
+            default:
+                break;
+        }
+        start_addr_03 += 2;
+    }
+
+    if( mc01.params_get_flag1 == 1 )
+    {
+        mc01.params_get_flag1 = 0;
+        mc01_parms_init();
+    }
+    
+}
+
+void Modbus_Fun04_DFG( void )
+{
+    uint16_t i = 0;
+
+    uint8_t start_addr_04 = 3;              //Slave reply  DATA1_H address
+
+    for( i = 0; i < 1; i++)
+    {
+        switch (i)
+        {
+            /*  40001   撒粉开关及方向                   */
+            case 0x00:  
+                mc01.th_temp    = ((rs485_2.rcv_buf[start_addr_04] << 8) | (rs485_2.rcv_buf[start_addr_04 + 1]));   
+                Write_Dgus(0X2104,mc01.th_temp);
+                break;
+
+            default:
+                break;
+        }
+        start_addr_04 += 2;
     }
 }
 
@@ -577,22 +709,19 @@ void Modbus_Fun16_slave1( void )
                 hansen.addr_0x06 = (rs485_5.RX_buf[modbus5.rcv_value_addr] << 8) | rs485_5.RX_buf[modbus5.rcv_value_addr + 1];
                 
                 hansen.addr_0x06_02 = hansen.addr_0x06 & 0x04;
-                if( hansen.addr_0x06_02 == 4 )
-                {
-                    hansen.addr_0x06_02 = 3;
-                }
+
                 hansen.addr_0x06_35 = (hansen.addr_0x06 & 0x38) >> 3;
-                if( hansen.addr_0x06_35 == 4 )
-                {
-                    hansen.addr_0x06_35 = 3;
-                }
+
                 hansen.addr_0x06_67 = (hansen.addr_0x06 & 0xc0) >> 6;
-                hansen.addr_0x06_8a = (hansen.addr_0x06 & 0x0700) >> 8;
-                if( hansen.addr_0x06_8a == 4 )
+                if( hansen.addr_0x06_67 == 3 )
                 {
-                    hansen.addr_0x06_8a = 3;
+                    hansen.addr_0x06_67 = 4;
                 }
+
+                hansen.addr_0x06_8a = (hansen.addr_0x06 & 0x0700) >> 8;
+
                 hansen.addr_0x06_bc = (hansen.addr_0x06 & 0x1800) >> 11;
+                hansen.addr_0x06_bc = 0x01 << hansen.addr_0x06_bc;
 
                 Write_Dgus(0x2051,hansen.addr_0x06_02);  
                 Write_Dgus(0x2052,hansen.addr_0x06_35);
@@ -616,10 +745,7 @@ void Modbus_Fun16_slave1( void )
             /*  0x0161  当前清洗类型    */     
             case 0x0161:
                 hansen.addr_0x22 = (rs485_5.RX_buf[modbus5.rcv_value_addr] << 8) | rs485_5.RX_buf[modbus5.rcv_value_addr + 1];
-                if( hansen.addr_0x22 == 4 )
-                {
-                    hansen.addr_0x22 = 3;
-                }
+
                 Write_Dgus(0x2022,hansen.addr_0x22);
                 hansen.addr_0x22 = 0;    
                 break;
@@ -1016,7 +1142,6 @@ void write_slave_06(uint16_t reg_addr, uint8_t reg_val_H, uint8_t reg_val_L)
     uint16_t crc;
 
     delay_ms(10);
-    download_flag = 0;
 
     send_buf[0] = SP350P_ADDR;       //Addr
     send_buf[1] = FUN_06;           //Fun
@@ -1043,6 +1168,7 @@ void write_slave_06(uint16_t reg_addr, uint8_t reg_val_H, uint8_t reg_val_L)
     delay_ms(1);
 }
 
+
 /**
  * @brief	写单个输出寄存器-03
  *
@@ -1051,7 +1177,7 @@ void write_slave_06(uint16_t reg_addr, uint8_t reg_val_H, uint8_t reg_val_L)
  *
  * @return  void
  */
-void get_slave_03( void )
+void get_slave_03_350p( void )
 {
     uint8_t send_buf[8];
     uint16_t crc;
@@ -1081,6 +1207,127 @@ void get_slave_03( void )
     delay_ms(2);
     SCON2T |= S4TI;                             //开始发送
     delay_ms(1);
+}
+
+/**
+ * @brief	写单个输出寄存器-03
+ *
+ * @param   reg_addr：要写的寄存器地址
+ *          reg_val： 要写的值
+ *
+ * @return  void
+ */
+void get_slave_03_MC01( void )
+{
+    uint8_t send_buf[8];
+    uint16_t crc;
+
+    download_flag = 0;
+    delay_ms(10);
+
+    send_buf[0] = DFJ_ADDR;       //Addr
+    send_buf[1] = FUN_03;           //Fun
+
+    /*   Value_H  && Value_L    */
+    send_buf[2] = 0x00;
+    send_buf[3] = 0x00;
+    send_buf[4] = 0x00 ;
+    send_buf[5] = 0x0d;
+
+    /*   crc    */
+    crc = MODBUS_CRC16(send_buf,6);
+    send_buf[6] = crc >> 8;
+    send_buf[7] = crc;
+
+    memcpy(rs485_2.send_buf,send_buf,8);
+    /*   发送，后使能接收    */
+    rs485_2.send_bytelength = 8;
+
+    DR2_485 = 1;
+
+    delay_ms(2);
+    TI0 = 1;                            //开始发送
+    delay_ms(1);
+}
+
+/**
+ * @brief	写单个输出寄存器-03
+ *
+ * @param   reg_addr：要写的寄存器地址
+ *          reg_val： 要写的值
+ *
+ * @return  void
+ */
+void get_slave_04_MC01( void )
+{
+    uint8_t send_buf[8];
+    uint16_t crc;
+
+    download_flag = 0;
+
+    send_buf[0] = DFJ_ADDR;     //Addr
+    send_buf[1] = FUN_04;       //Fun
+
+    /*   Value_H  && Value_L    */
+    send_buf[2] = 0x00;
+    send_buf[3] = 0x00;
+    send_buf[4] = 0x00 ;
+    send_buf[5] = 0x01;
+
+    /*   crc    */
+    crc = MODBUS_CRC16(send_buf,6);
+    send_buf[6] = crc >> 8;
+    send_buf[7] = crc;
+
+    memcpy(rs485_2.send_buf,send_buf,8);
+    /*   发送，后使能接收    */
+    rs485_2.send_bytelength = 8;
+
+    DR2_485 = 1;
+
+    delay_ms(2);
+    TI0 = 1;                            //开始发送
+    delay_ms(1);
+}
+
+
+/**
+ * @brief	写单个输出寄存器-06
+ *
+ * @param   reg_addr：要写的寄存器地址
+ *          reg_val： 要写的值
+ *
+ * @return  void
+ */
+void write_slave_06_MC01(uint16_t reg_addr, uint8_t reg_val_H, uint8_t reg_val_L)
+{
+    uint8_t send_buf[8];
+    uint16_t crc;
+
+    delay_ms(10);
+    download_flag = 0;
+
+    send_buf[0] = DFJ_ADDR;       //Addr
+    send_buf[1] = FUN_06;           //Fun
+
+    /*   Value_H  && Value_L    */
+    send_buf[2] = reg_addr >> 8;
+    send_buf[3] = reg_addr;
+    send_buf[4] = reg_val_H ;
+    send_buf[5] = reg_val_L;
+
+    /*   crc    */
+    crc = MODBUS_CRC16(send_buf,6);
+    send_buf[6] = crc >> 8;
+    send_buf[7] = crc;
+
+    memcpy(rs485_2.send_buf,send_buf,8);
+    /*   发送，后使能接收    */
+    rs485_2.send_bytelength = 8;
+
+    DR2_485 = 1;
+    TI0 = 1;
+    delay_ms(2);
 }
 
 /**
@@ -1145,71 +1392,6 @@ void slave1_to_master(uint8_t code_num, uint8_t length)
     TR5 = 1;                                //485可以发送
     delay_ms(2);
     SCON3T |= S5TI;                             //开始发送
-    delay_ms(1);
-}
-
-/**
- * @brief	从机回复主机
- *  
- * @param   code_num:功能码       
- * @param   length:数据长度        
- * 
-  @return  crc16:crc校验的值 2byte
- */
-void slave2_to_master(uint8_t code_num, uint8_t length)
-{
-    uint16_t crc;
-
-    switch(code_num)
-    {
-        case 0x03:
-            crc = MODBUS_CRC16(rs485_4.TX_buf,length);
-
-            // rs485_4.TX_buf[length+1] = crc;             //CRC H
-            // rs485_4.TX_buf[length] = crc>>8;            //CRC L
-
-            rs485_4.TX_buf[length] = crc;             //CRC H
-            rs485_4.TX_buf[length+1] = crc>>8;            //CRC L
-            
-            rs485_4.TX_send_bytelength = length + 2;
-            
-            break;
-
-        case 0x04:
-            crc = MODBUS_CRC16(rs485_4.TX_buf,length);
-
-            rs485_4.TX_buf[length+1] = crc;              //CRC H
-            rs485_4.TX_buf[length] = crc>>8;             //CRC L
-
-            rs485_4.TX_send_bytelength = length + 2;
-            
-            break;    
-
-        case 0x06:
-            memcpy(rs485_4.TX_buf,rs485_4.RX_buf,length);
-            rs485_4.TX_send_bytelength = length;
-
-            break;    
-
-        case 0x10:
-            memcpy(rs485_4.TX_buf,rs485_4.RX_buf,6);
-        
-            crc = MODBUS_CRC16(rs485_4.TX_buf,6);
-
-            rs485_4.TX_buf[6] = crc;                 //CRC H
-            rs485_4.TX_buf[7] = crc>>8;              //CRC L
-        
-            rs485_4.TX_send_bytelength = length;
-            
-            break; 
-
-        default:
-            break;
-    }
-
-    TR4 = 1;                                //485可以发送
-    delay_ms(2);
-    SCON2T |= S4TI;                             //开始发送
     delay_ms(1);
 }
 

@@ -13,13 +13,13 @@ RS485_5 rs485_5;
 **/
 void Uart2_Send_Statu_Init( void )
 {
-    rs485_2.RX2_rev_end_Flag = 0;
-    rs485_2.TX2_buf[128] = 0;
-    rs485_2.RX2_buf[128] = 0;
-    rs485_2.TX2_send_bytelength = 0;
-    rs485_2.TX2_send_cnt = 0;
-    rs485_2.RX2_rev_timeout = 0;
-    rs485_2.RX2_rev_cnt = 0;
+    rs485_2.rcv_end_flag = 0;
+    rs485_2.send_buf[128] = 0;
+    rs485_2.rcv_buf[128] = 0;
+    rs485_2.send_bytelength = 0;
+    rs485_2.send_cnt = 0;
+    rs485_2.rcv_timeout = 0;
+    rs485_2.rcv_cnt = 0;
     //DR_485 = 0;
 }
 
@@ -75,17 +75,17 @@ void Uart2_RXTX_Isr( void ) interrupt 4
         /* 2, 软件将S4TI清零，等待发送标志位重置，可继续发送    */
         TI0 = 0;    
         Busy2 = 0;   
-        /* 3, 依次将TX2_buf中数据送出（写SBUF0操作即为发送）    */
+        /* 3, 依次将send_buf中数据送出（写SBUF0操作即为发送）    */
         if( download_flag == 0 )
         {
-            if( rs485_2.TX2_send_bytelength != 0 )
+            if( rs485_2.send_bytelength != 0 )
             {
-                SBUF0 = rs485_2.TX2_buf[rs485_2.TX2_send_cnt++];
-                rs485_2.TX2_send_bytelength--;
+                SBUF0 = rs485_2.send_buf[rs485_2.send_cnt++];
+                rs485_2.send_bytelength--;
             }else
             {
-                rs485_2.TX2_send_cnt = 0;
-                //DR_485 = 0;
+                rs485_2.send_cnt = 0;
+                DR2_485 = 0;
             }
         }
     }
@@ -105,20 +105,20 @@ void Uart2_RXTX_Isr( void ) interrupt 4
 		T_O2=5; 
         
         /* 3, 判断数据包是否接收完毕                           */
-        if( !rs485_2.RX2_rev_end_Flag )
+        if( !rs485_2.rcv_end_flag )
         {
             /* 4, 数据包大于RX_buf 则从头计数                  */
-            if( rs485_2.RX2_rev_cnt > 128 )
+            if( rs485_2.rcv_cnt > 128 )
             {
-                rs485_2.RX2_rev_cnt = 0;
+                rs485_2.rcv_cnt = 0;
             }
 
-            /* 5, 依次将RX2_buf中数据接收（读S2BUF操作即为接收）*/
-            rs485_2.RX2_buf[rs485_2.RX2_rev_cnt] = SBUF0;
-            rs485_2.RX2_rev_cnt++;
+            /* 5, 依次将rcv_buf中数据接收（读S2BUF操作即为接收）*/
+            rs485_2.rcv_buf[rs485_2.rcv_cnt] = SBUF0;
+            rs485_2.rcv_cnt++;
         }
         /* 6, 重置接收完毕判断时间                              */
-        rs485_2.RX2_rev_timeout = 5;
+        rs485_2.rcv_timeout = 5;
     }
 
 }
@@ -251,16 +251,16 @@ void Tim1_Isr( void ) interrupt 3
     TL1   = (uint8_t)T0_PERIOD_1MS;  
 
     /* 1, 如果接收未超时                                             */
-    if ( rs485_2.RX2_rev_timeout != 0 )  
+    if ( rs485_2.rcv_timeout != 0 )  
     {
-        rs485_2.RX2_rev_timeout--;
+        rs485_2.rcv_timeout--;
         /* 2, 如果接收超时                                          */
-        if( rs485_2.RX2_rev_timeout == 0 )  
+        if( rs485_2.rcv_timeout == 0 )  
         {
-            if( rs485_2.RX2_rev_cnt > 0 )  
+            if( rs485_2.rcv_cnt > 0 )  
             {   
                  /* 3, 接收完毕标志位亮起并初始化接收缓冲区         */
-                rs485_2.RX2_rev_end_Flag = 1;    
+                rs485_2.rcv_end_flag = 1;    
             }
         }
     } 

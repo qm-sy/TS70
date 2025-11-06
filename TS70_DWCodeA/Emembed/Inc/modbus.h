@@ -4,7 +4,8 @@
 #include "communication.h"
 
 #define HANSEN_ADDR     0x01
-#define SP350P_ADDR      0x02
+#define SP350P_ADDR     0x02
+#define DFJ_ADDR        0x03
 
 #define FUN_03          0x03
 #define FUN_04          0x04
@@ -38,6 +39,8 @@ extern uint8_t fuyin_flag;
 
 void Modbus_Event_Uart2( void );
 
+void Modbus_Fun03_DFG( void );
+
 void Modbus_Event_Uart5( void );
 void Modbus_Fun03_slave1( void );
 void Modbus_Fun06_slave1( void );
@@ -47,9 +50,12 @@ void Modbus_Event_Uart4( void );
 void Modbus_Fun03_slave2( void );
 
 void slave1_to_master(uint8_t code_num,uint8_t length);
-void slave2_to_master(uint8_t code_num, uint8_t length);
 uint16_t MODBUS_CRC16(uint8_t *buf, uint16_t length);
 void write_slave_06(uint16_t reg_addr, uint8_t reg_val_H, uint8_t reg_val_L);
-void get_slave_03( void );
+void get_slave_03_350p( void );
+void write_slave_06_MC01(uint16_t reg_addr, uint8_t reg_val_H, uint8_t reg_val_L);
+void get_slave_03_MC01( void );
+void get_slave_04_MC01( void );
+void Modbus_Fun04_DFG( void );
 
 #endif

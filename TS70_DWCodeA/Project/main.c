@@ -21,7 +21,9 @@ void main()
 	gui_scan_flag = 0;
 	sp350.params_get_flag1 = 1;
 	sp350.params_get_flag2 = 1;
-
+	mc01.params_get_flag1 = 1;
+	mc01.params_get_flag2 = 1;
+	mc01.temp_scan_flag = 0;
 	delay_ms(200);
 
 	diwen_parms_init();
@@ -52,8 +54,18 @@ void main()
 		}
 		if( sp350.params_get_flag2 == 1 )
 		{
-			get_slave_03();
+			get_slave_03_350p();
 			sp350.params_get_flag2 = 0;
+		}
+		if( mc01.params_get_flag2 == 1 )
+		{
+			get_slave_03_MC01();
+			mc01.params_get_flag2 = 0;
+		}
+		if(( mc01.params_get_flag1 == 0 ) && ( mc01.temp_scan_flag == 1 ))
+		{
+			get_slave_04_MC01();
+			mc01.temp_scan_flag = 0;
 		}
 	}
 }

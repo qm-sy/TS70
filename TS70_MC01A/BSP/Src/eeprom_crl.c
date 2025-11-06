@@ -15,15 +15,21 @@ void eeprom_statu_judge( void )
 
     if( eeprom_statu_flag != 0x58 )
     {
-        slave_06.tc_preheat_temp    = 60;
-        slave_06.tc_alarm_temp      = 80;
-        slave_06.sf_level           = 30;
-        slave_06.df_level           = 30;
-        slave_06.iw1_switch         = 1;
-        slave_06.iw2_switch         = 1;
-        slave_06.cw_switch          = 1;
-        slave_06.mr_switch          = 1;
-        slave_06.sync_switch        = 1;
+        slave_06.PostDry_switch     = 1;
+        slave_06.PostDry_temp       = 80;
+        slave_06.SF_switch          = 1;
+        slave_06.SF_direction       = 0;
+        slave_06.SF_level           = 30;
+        slave_06.DF_switch          = 1;
+        slave_06.DF_direction       = 0;
+        slave_06.DF_level           = 30;
+        slave_06.IW1_switch         = 1;
+        slave_06.IW2_switch         = 1;
+        slave_06.CW_switch          = 1;
+        slave_06.MR_switch          = 1;
+        slave_06.Insulation_switch  = 1;
+        slave_06.Insulation_temp    = 80;
+        slave_06.sync_switch        = 0;
 
         eeprom_data_record(); 
     }
@@ -41,15 +47,21 @@ void eeprom_data_record( void )
 {
     ISP_Earse(0x0000);
 
-    ISP_Write(PREHEAT_TEMP_ADDR,slave_06.tc_preheat_temp);
-    ISP_Write(ALARM_TEMP_ADDR,slave_06.tc_alarm_temp);
-    ISP_Write(SF24_ADDR,slave_06.sf_level);
-    ISP_Write(DF24_ADDR,slave_06.df_level);
-    ISP_Write(IW1_ADDR,slave_06.iw1_switch);
-    ISP_Write(IW2_ADDR,slave_06.iw2_switch);
-    ISP_Write(CW_ADDR,slave_06.cw_switch);
-    ISP_Write(MR_ADDR,slave_06.mr_switch);
-    ISP_Write(SYNC_ADDR,slave_06.sync_switch);
+    ISP_Write(PD_SWITCH,slave_06.PostDry_switch);
+    ISP_Write(PD_TEMP,slave_06.PostDry_temp);
+    ISP_Write(SF_SWITCH,slave_06.SF_switch);
+    ISP_Write(SF_DIRECTION,slave_06.SF_direction);
+    ISP_Write(SF_LEVEL,slave_06.SF_level);
+    ISP_Write(DF_SWITCH,slave_06.DF_switch);
+    ISP_Write(DF_DIRECTION,slave_06.DF_direction);
+    ISP_Write(DF_LEVEL,slave_06.DF_level);
+    ISP_Write(IW1_SWITCH,slave_06.IW1_switch);
+    ISP_Write(IW2_SWITCH,slave_06.IW2_switch);
+    ISP_Write(CW_SWITCH,slave_06.CW_switch);
+    ISP_Write(MR_SWITCH,slave_06.MR_switch);
+    ISP_Write(INSU_SWITCH,slave_06.Insulation_switch);
+    ISP_Write(INSU_TEMP,slave_06.Insulation_temp);
+    ISP_Write(SYNC_SWITCH,slave_06.sync_switch);
 
     ISP_Write(EEPROM_STATU_JUDGE,0x58);
 
@@ -66,25 +78,29 @@ void eeprom_data_record( void )
 **/
 void eeprom_data_init( void )
 {
-    slave_06.tc_preheat_temp = ISP_Read(PREHEAT_TEMP_ADDR);
+    slave_06.PostDry_switch     = ISP_Read(PD_SWITCH);
+    slave_06.PostDry_temp       = ISP_Read(PD_TEMP);
 
-    slave_06.tc_alarm_temp   = ISP_Read(ALARM_TEMP_ADDR);
+    slave_06.SF_switch          = ISP_Read(SF_SWITCH);
+    slave_06.SF_direction       = ISP_Read(SF_DIRECTION);
+    slave_06.SF_level           = ISP_Read(SF_LEVEL);
 
-    slave_06.sf_level        = ISP_Read(SF24_ADDR);
+    slave_06.DF_switch          = ISP_Read(DF_SWITCH);
+    slave_06.DF_direction       = ISP_Read(DF_DIRECTION);
+    slave_06.DF_level           = ISP_Read(DF_LEVEL);
 
-    slave_06.df_level        = ISP_Read(DF24_ADDR);
-
-    slave_06.iw1_switch      = ISP_Read(IW1_ADDR);
-    slave_06.iw2_switch      = ISP_Read(IW2_ADDR);
+    slave_06.IW1_switch         = ISP_Read(IW1_SWITCH);
+    slave_06.IW2_switch         = ISP_Read(IW2_SWITCH);
     IW_ctrl();
 
-    slave_06.cw_switch       = ISP_Read(CW_ADDR);
-    CW_ctrl();
+    slave_06.CW_switch          = ISP_Read(CW_SWITCH);
 
-    slave_06.mr_switch       = ISP_Read(MR_ADDR);
-    MR_ctrl();
+    slave_06.MR_switch          = ISP_Read(MR_SWITCH);
 
-    slave_06.sync_switch     = ISP_Read(SYNC_ADDR);
+    slave_06.Insulation_switch  = ISP_Read(INSU_SWITCH);
+    slave_06.Insulation_temp    = ISP_Read(INSU_TEMP);
 
-    PN1_24V = DD_24V = PN2_24V = 1;
+    slave_06.sync_switch        = ISP_Read(SYNC_SWITCH);
+
+    slave_06.power_switch       = 1;
 }

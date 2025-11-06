@@ -1,6 +1,8 @@
 #include "tim.h"
 
 bit gui_scan_flag;
+uint16_t scan_03_cnt_350p = 0;
+uint16_t scan_03_cnt_mc01 = 0;
 
 void Tim0_Init( void )      //1ms
 {
@@ -32,7 +34,7 @@ void Tim0_Isr( void ) interrupt 1
 {
     static uint8_t press_scan_cnt = 0;
     static uint16_t paoji_cnt = 0;
-    static uint16_t scan_03_cnt = 0;
+    static uint16_t temp_scan_cnt = 0;
 
     TH0   = (uint8_t)(T0_PERIOD_1MS>>8);
     TL0   = (uint8_t)T0_PERIOD_1MS;      
@@ -80,15 +82,42 @@ void Tim0_Isr( void ) interrupt 1
 
     if(( sp350.params_get_flag1 == 1 ) && ( sp350.params_get_flag2 == 0 ))
     {
-        scan_03_cnt++;
-        if( scan_03_cnt == 200 )
+        scan_03_cnt_350p++;
+        if( scan_03_cnt_350p == 200 )
         {
             sp350.params_get_flag2 = 1;
-            scan_03_cnt = 0;
+            scan_03_cnt_350p = 0;
         }
     }else
     {
-        scan_03_cnt = 0;
+        scan_03_cnt_350p = 0;
+    }
+
+    if(( mc01.params_get_flag1 == 1 ) && ( mc01.params_get_flag2 == 0 ))
+    {
+        scan_03_cnt_mc01++;
+        if( scan_03_cnt_mc01 == 500 )
+        {
+            mc01.params_get_flag2 = 1;
+            scan_03_cnt_mc01 = 0;
+        }
+    }else
+    {
+        scan_03_cnt_mc01 = 0;
+    }
+
+
+    if( mc01.temp_scan_flag == 0 )
+    {
+        temp_scan_cnt++;
+        if( temp_scan_cnt == 1000 )
+        {
+            mc01.temp_scan_flag = 1;
+            temp_scan_cnt = 0;
+        }
+    }else
+    {
+        temp_scan_cnt = 0;
     }
 }
 

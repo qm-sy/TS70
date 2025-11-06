@@ -3,5 +3,5 @@
 void GPIO_Init( void )
 {
     P0MDOUT |= 0X13;
-    P1MDOUT |= 0X80;
+    P1MDOUT |= 0X81;
 }

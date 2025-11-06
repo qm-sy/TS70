@@ -31,6 +31,31 @@ typedef struct
 
 typedef struct 
 {
+    uint8_t  PostDry_switch;
+    uint8_t  PostDry_temp;   
+    uint8_t  SF_switch;
+    uint8_t  SF_direction;
+    uint8_t  SF_level;
+    uint8_t  DF_switch;
+    uint8_t  DF_direction;
+    uint8_t  DF_level;
+    uint8_t  IW1_switch;
+    uint8_t  IW2_switch;
+    uint8_t  CW_switch;
+    uint8_t  MR_switch;
+    uint8_t  Insulation_switch;
+    uint8_t  Insulation_temp;
+    uint8_t  sync_switch;
+    uint8_t  power_switch;
+    uint8_t  params_get_flag1;
+    uint8_t  params_get_flag2;
+
+    uint8_t temp_scan_flag;
+    uint16_t th_temp;
+}MC01;
+
+typedef struct 
+{
     uint16_t  cnt_s;       //数据包接收完毕标志
     uint16_t  cnt_min;           //SBUF TI缓冲区
     uint16_t  cnt_h;           //SBUF RI缓冲区
@@ -101,11 +126,13 @@ typedef struct
 extern SP350 sp350;
 extern HANSEN hansen;
 extern DAYIN_T dayin_t;
+extern MC01 mc01;
 
 void gui_vol_ctrl( uint16_t addr, uint8_t val_H, uint8_t val_L);
 void sp350_parms_init( void );
 void diwen_parms_init( void );
 void jump_page( uint8_t page_num );
 void time_trans( uint16_t time_val ,uint8_t num );
+void mc01_parms_init( void );
 
 #endif

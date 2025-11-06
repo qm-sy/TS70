@@ -12,14 +12,13 @@
 
 typedef struct 
 {
-    uint8_t     RX2_rev_end_Flag;       //数据包接收完毕标志
-    uint8_t     TX2_buf[128];           //SBUF TI缓冲区
-    uint8_t     RX2_buf[128];           //SBUF RI缓冲区
-    uint8_t     TX2_send_bytelength;    //发送字节数
-    uint8_t     TX2_send_cnt;           //发送计数
-    uint16_t    RX2_rev_timeout;        //接收超时
-    uint8_t     RX2_rev_cnt;            //接收计数
-    uint8_t     DR_Flag;                //DR
+    uint8_t     rcv_end_flag;       //数据包接收完毕标志
+    uint8_t     send_buf[128];           //SBUF TI缓冲区
+    uint8_t     rcv_buf[128];           //SBUF RI缓冲区
+    uint8_t     send_bytelength;    //发送字节数
+    uint8_t     send_cnt;           //发送计数
+    uint16_t    rcv_timeout;        //接收超时
+    uint8_t     rcv_cnt;            //接收计数
 }RS485_2;
 
 typedef struct 
@@ -31,8 +30,6 @@ typedef struct
     uint8_t     TX_send_cnt;           //发送计数
     uint16_t    RX_rcv_timeout;        //接收超时
     uint8_t     RX_rcv_cnt;            //接收计数
-    
-    uint8_t     DR_Flag;                //DR
 }RS485_4;
 
 typedef struct 
@@ -44,7 +41,6 @@ typedef struct
     uint8_t     TX_send_cnt;           //发送计数
     uint16_t    RX_rcv_timeout;        //接收超时
     uint16_t    RX_rcv_cnt;            //接收计数
-    uint8_t     DR_Flag;                //DR
 }RS485_5;
 
 extern RS485_2 rs485_2;

@@ -4,9 +4,9 @@
 |P0^2|RX4       |P1^2|          |P2^2|IW_2      |P3^2|ZERO      |P4^2|Sensor_1  |P5^2|     
 |P0^3|TX4       |P1^3|DD_ADC    |P2^3|IW_1      |P3^3|DF_24V    |P4^3|          |P5^3|     
 |P0^4|DR4       |P1^4|PN2_ADC   |P2^4|          |P3^4|CW_24V    |P4^4|WK_220V   |P5^4|PN1_ADC
-|P0^5|PN1_24V   |P1^5|SF_ADC    |P2^5|          |P3^5|Sensor_5  |P4^5|          |P5^5|             
-|P0^6|DD_24V    |P1^6|DF_ADC    |P2^6|          |P3^6|Sensor_4  |P4^6|          |P5^6|     
-|P0^7|PN2_24V   |P1^7|CW_ADC    |P2^7|          |P3^7|Sensor_3  |P4^7|SF_24V    |P5^7|     
+|P0^5|PN1_24V   |P1^5|SF_ADC    |P2^5|          |P3^5|Sensor_5  |P4^5|SCK       |P5^5|             
+|P0^6|DD_24V    |P1^6|DF_ADC    |P2^6|S01       |P3^6|Sensor_4  |P4^6|          |P5^6|     
+|P0^7|PN2_24V   |P1^7|CW_ADC    |P2^7|CS        |P3^7|Sensor_3  |P4^7|SF_24V    |P5^7|     
 */ 
 
 #ifndef _GPIO_H_
@@ -18,10 +18,10 @@ sbit RX3        = P0^0;
 sbit TX3        = P0^1;
 sbit RX4        = P0^2;
 sbit TX4        = P0^3;
-sbit DR4        = P0^4;
-sbit PN1_24V    = P0^5;
-sbit DD_24V     = P0^6;
-sbit PN2_24V    = P0^7;
+sbit DR4_485    = P0^4;
+sbit PN1_24V    = P0^5;     //正反转    CN1
+sbit DD_24V     = P0^6;     //导带电机  CN2
+sbit PN2_24V    = P0^7;     //正反转    CN3
 
 sbit RX2        = P1^0;
 sbit TX2        = P1^1;
@@ -35,12 +35,14 @@ sbit MR_220V    = P2^0;
 sbit Relay3     = P2^1;
 sbit IW_2       = P2^2;
 sbit IW_1       = P2^3;
+sbit TH_S01     = P2^6;
+sbit TH_CS      = P2^7;
 
 sbit RX1        = P3^0;
 sbit TX1        = P3^1;
 sbit ZERO       = P3^2;
-sbit DF_24V     = P3^3;
-sbit CW_24V     = P3^4;
+sbit DF_24V     = P3^3;     //抖粉电机 CN5
+sbit CW_24V     = P3^4;     //冷风开关 CN4
 sbit Sensor_5   = P3^5;
 sbit Sensor_4   = P3^6;
 sbit Sensor_3   = P3^7;
@@ -48,7 +50,8 @@ sbit Sensor_3   = P3^7;
 sbit Sensor_2   = P4^1;
 sbit Sensor_1   = P4^2;
 sbit WK_220V    = P4^4;
-sbit SF_24V     = P4^7;
+sbit TH_SCK     = P4^5;
+sbit SF_24V     = P4^7;     //撒粉电机 CN6
 
 sbit PN1_ADC    = P5^4;
 

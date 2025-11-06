@@ -3,6 +3,7 @@
 SP350 sp350;
 HANSEN hansen;
 DAYIN_T dayin_t;
+MC01 mc01;
 
 void sp350_parms_init( void )
 {
@@ -17,6 +18,30 @@ void sp350_parms_init( void )
     Write_Dgus(0x2018,(uint16_t)sp350.fan_switch);
 }
 
+void mc01_parms_init( void )
+{
+    Write_Dgus(0x2103,(uint16_t)mc01.PostDry_switch);
+    Write_Dgus(0x2105,(uint16_t)mc01.PostDry_temp);
+
+    Write_Dgus(0x2110,(uint16_t)((mc01.SF_direction << 8) | mc01.SF_switch));
+    Write_Dgus(0x2111,(uint16_t)mc01.SF_level);
+
+    Write_Dgus(0x2112,(uint16_t)((mc01.DF_direction << 8) | mc01.DF_switch));
+    Write_Dgus(0x2113,(uint16_t)mc01.DF_level);
+
+    Write_Dgus(0x2114,(uint16_t)((mc01.IW2_switch << 8) | mc01.IW1_switch));
+
+    Write_Dgus(0x2115,(uint16_t)mc01.CW_switch);
+    Write_Dgus(0x2116,(uint16_t)mc01.MR_switch);
+
+    Write_Dgus(0x2117,(uint16_t)mc01.Insulation_switch);
+    Write_Dgus(0x2118,(uint16_t)mc01.Insulation_temp);
+    
+    Write_Dgus(0x2119,(uint16_t)mc01.sync_switch);
+    Write_Dgus(0x211A,(uint16_t)mc01.power_switch);
+}
+
+
 void diwen_parms_init( void )
 {
     hansen.ctrl_flag = 0;
@@ -27,8 +52,8 @@ void diwen_parms_init( void )
     hansen.addr_0x10 = 0x1f;
     hansen.addr_0x20 = 0x00;
     hansen.addr_0x21 = 0x00;
-    hansen.addr_0x22 = 0x00;
-    hansen.addr_0x23 = 0x00;
+    hansen.addr_0x22 = 0x01;
+    hansen.addr_0x23 = 0x0f;
     hansen.addr_0x2d = 0x00;
     hansen.addr_0x30 = 0x00;
     hansen.addr_0x0c = 0x01;
@@ -69,11 +94,7 @@ void gui_vol_ctrl( uint16_t addr, uint8_t val_H, uint8_t val_L)
 
         case 0x2022:
             hansen.addr_0x22 = (val_H << 8) |  val_L;
-            if( hansen.addr_0x22 == 3 )
-            {
-                hansen.addr_0x22 = 4;
-            }
-            
+  
             break;   
 
         case 0x2023:
@@ -93,7 +114,7 @@ void gui_vol_ctrl( uint16_t addr, uint8_t val_H, uint8_t val_L)
             {
                 case 1: hansen.addr_0x06 |= 0x01;       break;
                 case 2: hansen.addr_0x06 |= 0x02;       break;
-                case 3: hansen.addr_0x06 |= 0x04;       break;
+                case 4: hansen.addr_0x06 |= 0x04;       break;
                 default:                                break;
             }
             
@@ -105,7 +126,7 @@ void gui_vol_ctrl( uint16_t addr, uint8_t val_H, uint8_t val_L)
             {
                 case 1: hansen.addr_0x06 |= 0x08;       break;
                 case 2: hansen.addr_0x06 |= 0x10;       break;
-                case 3: hansen.addr_0x06 |= 0x20;       break;
+                case 4: hansen.addr_0x06 |= 0x20;       break;
                 default:                                break;
             }
             
@@ -117,7 +138,7 @@ void gui_vol_ctrl( uint16_t addr, uint8_t val_H, uint8_t val_L)
             {
                 case 1: hansen.addr_0x06 |= 0x40;       break;
                 case 2: hansen.addr_0x06 |= 0x80;       break;
-                case 3: hansen.addr_0x06 |= 0xc0;       break;
+                case 4: hansen.addr_0x06 |= 0xc0;       break;
                 default:                                break;
             }
             
@@ -129,7 +150,7 @@ void gui_vol_ctrl( uint16_t addr, uint8_t val_H, uint8_t val_L)
             {
                 case 1: hansen.addr_0x06 |= 0x0100;     break;
                 case 2: hansen.addr_0x06 |= 0x0200;     break;
-                case 3: hansen.addr_0x06 |= 0x0400;     break;
+                case 4: hansen.addr_0x06 |= 0x0400;     break;
                 default:                                break;
             }
             
@@ -139,10 +160,10 @@ void gui_vol_ctrl( uint16_t addr, uint8_t val_H, uint8_t val_L)
             hansen.addr_0x06 &= ~0x1800;
             switch (val_L)
             {
-                case 0: hansen.addr_0x06 |= 0x0000;     break;
-                case 1: hansen.addr_0x06 |= 0x0800;     break;
-                case 2: hansen.addr_0x06 |= 0x1000;     break;
-                case 3: hansen.addr_0x06 |= 0x1800;     break;
+                case 1: hansen.addr_0x06 |= 0x0000;     break;
+                case 2: hansen.addr_0x06 |= 0x0800;     break;
+                case 4: hansen.addr_0x06 |= 0x1000;     break;
+                case 8: hansen.addr_0x06 |= 0x1800;     break;
                 default:                                break;
             }
             
@@ -283,6 +304,73 @@ void gui_vol_ctrl( uint16_t addr, uint8_t val_H, uint8_t val_L)
 
             break; 
 
+        case 0x2100:
+
+            break;
+
+        case 0x2101:
+
+            break;
+
+        case 0x2102:
+
+            break;
+
+        case 0x2103:
+            write_slave_06_MC01(0x00,val_H,val_L);
+            break;
+
+        case 0x2104:
+
+            break;
+
+        case 0x2105:
+            write_slave_06_MC01(0x01,val_H,val_L);
+            break;
+
+        case 0x2110:
+            write_slave_06_MC01(0x02,val_H,val_L);
+            break;
+
+        case 0x2111:
+            write_slave_06_MC01(0x03,val_H,val_L);
+            break;
+
+        case 0x2112:
+            write_slave_06_MC01(0x04,val_H,val_L);
+            break;
+
+        case 0x2113:
+            write_slave_06_MC01(0x05,val_H,val_L);
+            break;
+
+        case 0x2114:
+            write_slave_06_MC01(0x06,val_H,val_L);
+            break;
+
+        case 0x2115:
+            write_slave_06_MC01(0x07,val_H,val_L);
+            break;
+
+        case 0x2116:
+            write_slave_06_MC01(0x08,val_H,val_L);
+            break;
+
+        case 0x2117:
+            write_slave_06_MC01(0x09,val_H,val_L);
+            break;
+
+        case 0x2118:
+            write_slave_06_MC01(0x0a,val_H,val_L);
+            break;
+
+        case 0x2119:
+            write_slave_06_MC01(0x0b,val_H,val_L);
+            break;
+
+        case 0x211a:
+            write_slave_06_MC01(0x0c,val_H,val_L);
+            break;
         default:
             break;
     }

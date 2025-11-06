@@ -46,7 +46,7 @@
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
           <OutputDirectory>..\Output\</OutputDirectory>
-          <OutputName>SP_DRY1_QDC01C_HW1.74_SW002_20250627</OutputName>
+          <OutputName>TS70_MC01A_SW001_Test_20251105</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
           <CreateHexFile>1</CreateHexFile>

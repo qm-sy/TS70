@@ -43,6 +43,7 @@ void Uart2_Init( uint32_t baud )
     SREL0L = (uint8_t)baud;
 
     ES0 = 1;                //uart2 中断开启
+	DR2_485 = 0;
 }
 
 void Uart4_Init( uint32_t baud )
@@ -228,7 +229,7 @@ void  Sw_Data_Send()
 
 		gui_vol_ctrl(addr_vol, val_H, val_L);
 
-		uart_data_send(Val, 2, 1, CRC_CHECK_UART2);	
+		//uart_data_send(Val, 2, 1, CRC_CHECK_UART2);	
 		Write_Dgus(0x0f00, 0);Write_Dgus(0x0f01, 0);
 	}
 }

@@ -14,37 +14,34 @@ void Modbus_Event( void )
     uint16_t crc,rccrc;
     
     /*1.接收完毕                                           */
-    if( rs485.RX4_rev_end_Flag == 1 )
+    if( rs485_4.rcv_end_flag == 1 )
     {
-        /*2.清空接收完毕标志位                              */    
-        rs485.RX4_rev_end_Flag = 0;
+        /*2.CRC校验                                         */
+        crc = MODBUS_CRC16(rs485_4.rcv_buf, rs485_4.rcv_cnt - 2);
+        rccrc = (rs485_4.rcv_buf[rs485_4.rcv_cnt - 1]) | (rs485_4.rcv_buf[rs485_4.rcv_cnt - 2] << 8);
+        
 
-        /*3.CRC校验                                         */
-        crc = MODBUS_CRC16(rs485.RX4_buf, rs485.RX4_rev_cnt-2);
-        rccrc = (rs485.RX4_buf[rs485.RX4_rev_cnt - 1]) | (rs485.RX4_buf[rs485.RX4_rev_cnt -2 ] << 8);
-        /*4.清空接收计数                                    */
-        rs485.RX4_rev_cnt = 0; 
-
-        /*5.CRC校验通过，进行地址域校验                      */
+        /*3.CRC校验通过，进行地址域校验                      */
         if( crc == rccrc )
         {
-            /*6.地址域校验通过，进入相应功能函数进行处理      */
-            if( rs485.RX4_buf[0] == MY_ADDR )
+            /*3-1.地址域校验通过，进入相应功能函数进行处理      */
+            if( rs485_4.rcv_buf[0] == MY_ADDR )
             {
-                switch ( rs485.RX4_buf[1] )
+                switch (rs485_4.rcv_buf[1])
                 {
-                    case 0x03:      Modbus_Fun3();      break;
-                    case 0x04:      Modbus_Fun4();      break;
-                    case 0x06:      Modbus_Fun6();      break;
+                    case FUN_03:      Modbus_Fun3();      break;
+                    case FUN_04:      Modbus_Fun4();      break;
+                    case FUN_06:      Modbus_Fun6();      break;
 
                     default:                            break;
                 }
             }
         }
+        /*4.清空接收完毕标志位  清空接收计数        */    
+        rs485_4.rcv_end_flag = 0;
+        rs485_4.rcv_cnt = 0; 
     }
 }
-
-
 
 /**
  * @brief	读输入寄存器  03
@@ -57,74 +54,105 @@ void Modbus_Fun3( void )
 {
     uint16_t i;
 
-    modbus.send_value_addr  = 3;                //DATA1 H 位置
-    modbus.byte_cnt   = (rs485.RX4_buf[4]<<8 | rs485.RX4_buf[5]) *2;
-    modbus.start_addr = rs485.RX4_buf[2]<<8 | rs485.RX4_buf[3];
+    modbus.rcv_addr1_valH  = 3;                //DATA1 H 位置
+    modbus.start_reg_03    = rs485_4.rcv_buf[2] << 8 | rs485_4.rcv_buf[3];
+    modbus.reg_num_03      = rs485_4.rcv_buf[4] << 8 | rs485_4.rcv_buf[5];
 
-    rs485.TX4_buf[0]  = MY_ADDR;                //Addr
-    rs485.TX4_buf[1]  = 0x03;                   //Fun
-    rs485.TX4_buf[2]  = modbus.byte_cnt;        //Byte Count
+    rs485_4.send_buf[0]  = MY_ADDR;                  //Addr
+    rs485_4.send_buf[1]  = FUN_03;                   //Fun
+    rs485_4.send_buf[2]  = modbus.reg_num_03 * 2;    //Byte Count
 
-    for( i = modbus.start_addr; i < modbus.start_addr + modbus.byte_cnt/2; i++ )
+    for( i = modbus.start_reg_03; i < modbus.start_reg_03 + modbus.reg_num_03; i++ )
     {
-        /*    每次循环前初始化byte_info                       */
-        modbus.byte_info_H = modbus.byte_info_L = 0X00;
         switch (i)
-        {   
-            /*  40001 热电偶预加热和加热停止温度    */
+        {             
+            /*  40001 后烘干开关    */
             case 0x00:  
-                modbus.byte_info_H  = slave_06.tc_preheat_temp;
-                modbus.byte_info_L  = slave_06.tc_alarm_temp;  
-                
+                modbus.byte_info_H  = 0x00;
+                modbus.byte_info_L  = slave_06.PostDry_switch;  
                 break;
 
-            /*  40002 撒粉功率                      */
+            /*  40002 后烘干加热温度                      */
             case 0x01:
                 modbus.byte_info_H  = 0x00;
-                modbus.byte_info_L  = slave_06.sf_level;; 
-
+                modbus.byte_info_L  = slave_06.PostDry_temp;; 
                 break;
 
-            /*  40003 抖粉功率                      */    
-            case 0x02:
-                modbus.byte_info_H  = 0X00;
-                modbus.byte_info_L  = slave_06.df_level; 
+            /*  40003 撒粉开关及方向    */
+            case 0x02:  
+                modbus.byte_info_H  = slave_06.SF_direction;
+                modbus.byte_info_L  = slave_06.SF_switch;  
+                break;
 
+            /*  40004 撒粉功率                      */
+            case 0x03:
+                modbus.byte_info_H  = 0x00;
+                modbus.byte_info_L  = slave_06.SF_level;; 
+                break;
+
+            /*  40005 抖粉开关及方向                  */    
+            case 0x04:
+                modbus.byte_info_H  = slave_06.DF_direction;
+                modbus.byte_info_L  = slave_06.DF_switch; 
                 break;
  
-            /*  40004 吸风开关                      */
-            case 0x03:    
-                modbus.byte_info_H  = slave_06.iw2_switch;
-                modbus.byte_info_L  = slave_06.iw1_switch;; 
-
+            /*  40006 抖粉功率                        */
+            case 0x05:    
+                modbus.byte_info_H  = 0x00;
+                modbus.byte_info_L  = slave_06.DF_level;; 
                 break;
 
-            /*  40005 冷风开关                      */
-            case 0x04:   
-                modbus.byte_info_H  = 0X00;
-                modbus.byte_info_L  = slave_06.cw_switch; 
-
+            /*  40007 吸风开关                      */
+            case 0x06:   
+                modbus.byte_info_H  = slave_06.IW2_switch;
+                modbus.byte_info_L  = slave_06.IW1_switch; 
                 break;
                 
-            /*  40006 收料开关                      */
-            case 0x05:   
+            /*  40008 冷风开关                      */
+            case 0x07:   
                 modbus.byte_info_H  = 0X00;
-                modbus.byte_info_L  = slave_06.mr_switch; 
+                modbus.byte_info_L  = slave_06.CW_switch; 
                 break;
 
-            /*  40007 同步开关                      */
-            case 0x06:   
+            /*  40009 收料开关                      */
+            case 0x08:   
+                modbus.byte_info_H  = 0X00; 
+                modbus.byte_info_L  = slave_06.MR_switch; 
+                break;
+
+            /*  40010 保温开关                      */
+            case 0x09:   
+                modbus.byte_info_H  = 0X00;
+                modbus.byte_info_L  = slave_06.Insulation_switch; 
+                break;
+
+            /*  400011 保温温度                      */
+            case 0x0a:   
+                modbus.byte_info_H  = 0X00; 
+                modbus.byte_info_L  = slave_06.Insulation_temp; 
+                break;
+
+            /*  40012 同步开关                      */
+            case 0x0b:   
                 modbus.byte_info_H  = 0X00; 
                 modbus.byte_info_L  = slave_06.sync_switch; 
                 break;
 
+            /*  40013 总开关                      */
+            case 0x0c:   
+                modbus.byte_info_H  = 0X00; 
+                modbus.byte_info_L  = slave_06.power_switch; 
+                break;
+
             default:
+                modbus.byte_info_H = 0x00;
+                modbus.byte_info_L = 0x00;
                 break;
         }
-        rs485.TX4_buf[modbus.send_value_addr++] = modbus.byte_info_H;
-        rs485.TX4_buf[modbus.send_value_addr++] = modbus.byte_info_L;
+        rs485_4.send_buf[modbus.rcv_addr1_valH++] = modbus.byte_info_H;
+        rs485_4.send_buf[modbus.rcv_addr1_valH++] = modbus.byte_info_L;
     }
-    slave_to_master(0x03,3 + modbus.byte_cnt);
+    slave_to_master(FUN_03,3 + modbus.reg_num_03 * 2);
 }
 
 /**
@@ -138,34 +166,33 @@ void Modbus_Fun4( void )
 {
     uint16_t i;
 
-    modbus.send_value_addr  = 3;                 //DATA1 H 位置
-    modbus.byte_cnt   = (rs485.RX4_buf[4]<<8 | rs485.RX4_buf[5]) *2;
-    modbus.start_addr = rs485.RX4_buf[2]<<8 | rs485.RX4_buf[3];
+    modbus.rcv_addr1_valH  = 3;                    //DATA1 H 位置
+    modbus.start_reg_04 = rs485_4.rcv_buf[2] << 8 | rs485_4.rcv_buf[3];
+    modbus.reg_num_04   = rs485_4.rcv_buf[4] << 8 | rs485_4.rcv_buf[5];
 
-    rs485.TX4_buf[0]  = MY_ADDR;                //Addr
-    rs485.TX4_buf[1]  = 0x04;                   //Fun
-    rs485.TX4_buf[2]  = modbus.byte_cnt;        //Byte Count
+    rs485_4.send_buf[0]  = MY_ADDR;                  //Addr
+    rs485_4.send_buf[1]  = FUN_04;                   //Fun
+    rs485_4.send_buf[2]  = modbus.reg_num_04 * 2;    //Byte Count
 
-    for( i = modbus.start_addr; i < modbus.start_addr + modbus.byte_cnt/2; i++ )
+    for( i = modbus.start_reg_04; i < modbus.start_reg_04 + modbus.reg_num_04; i++ )
     {
-        /*    每次循环前初始化byte_info                 */
-        modbus.byte_info_H = modbus.byte_info_L = 0X00;
         switch (i)
         {
             /*  30001  热电偶温度                       */
             case 0x00:
-                modbus.byte_info_H = 0X00; 
-                modbus.byte_info_L = slave_04.tc_temp; 
-
+                modbus.byte_info_H = temp.th_temp >> 8;
+                modbus.byte_info_L = temp.th_temp;
                 break;
 
             default:
+                modbus.byte_info_H = 0X00;
+                modbus.byte_info_L = 0X00;
                 break;
         }
-        rs485.TX4_buf[modbus.send_value_addr++] = modbus.byte_info_H;
-        rs485.TX4_buf[modbus.send_value_addr++] = modbus.byte_info_L;
+        rs485_4.send_buf[modbus.rcv_addr1_valH++] = modbus.byte_info_H;
+        rs485_4.send_buf[modbus.rcv_addr1_valH++] = modbus.byte_info_L;
     }
-    slave_to_master(0x04,3 + modbus.byte_cnt);
+    slave_to_master(FUN_04,3 + modbus.reg_num_04 * 2);
 }
 
 /**
@@ -177,60 +204,95 @@ void Modbus_Fun4( void )
 **/
 void Modbus_Fun6( void )
 {
-    switch (rs485.RX4_buf[3])
+    modbus.reg_addr_06 = rs485_4.rcv_buf[2] << 8 | rs485_4.rcv_buf[3];
+    modbus.byte_info_H = rs485_4.rcv_buf[4];
+    modbus.byte_info_L = rs485_4.rcv_buf[5];
+
+    switch (rs485_4.rcv_buf[3])
     {
-        /*  40001 热电偶预加热和加热停止温度    */
-        case 0x00:           
-            slave_06.tc_preheat_temp = rs485.RX4_buf[4];                    
-            slave_06.tc_alarm_temp   = rs485.RX4_buf[5];      
-
-            break;  
-
-        /*  40002 撒粉功率                      */
-        case 0x01:                 
-            slave_06.sf_level   = rs485.RX4_buf[5];   
+        /*  40001   后烘干开关                   */
+        case 0x00:
+            slave_06.PostDry_switch = modbus.byte_info_L;   
 
             break;
 
-        /*  40003 抖粉功率                      */    
-        case 0x02:                                                         
-            slave_06.df_level   = rs485.RX4_buf[5];   
+        /*  40002   后烘干温度                   */
+        case 0x01:
+            slave_06.PostDry_temp = modbus.byte_info_L;   
+
+            break; 
+
+        /*  40003   撒粉开关及方向                   */
+        case 0x02:
+            slave_06.SF_direction = modbus.byte_info_H;   
+            slave_06.SF_switch    = modbus.byte_info_L;   
 
             break;
-            
-        /*  40004 吸风开关                      */
+
+        /*  40004   撒粉功率                   */
         case 0x03:
-            slave_06.iw2_switch   = rs485.RX4_buf[4];                                                         
-            slave_06.iw1_switch   = rs485.RX4_buf[5];   
+            slave_06.SF_level = modbus.byte_info_L;   
+
+            break; 
+
+        /*  40005   抖粉开关及方向                */
+        case 0x04:
+            slave_06.DF_direction = modbus.byte_info_H;   
+            slave_06.DF_switch    = modbus.byte_info_L;   
+
+            break;
+
+        /*  40006   抖粉功率              */
+        case 0x05:
+            slave_06.DF_level = modbus.byte_info_L;   
+
+            break;   
+
+        /*  40007   吸风开关              */
+        case 0x06:
+            slave_06.IW2_switch = modbus.byte_info_H;  
+            slave_06.IW1_switch = modbus.byte_info_L;   
             IW_ctrl();
+            break;   
 
-            break;
+        /*  40008   冷风开关              */
+        case 0x07:
+            slave_06.CW_switch = modbus.byte_info_L;   
+            break; 
 
-        /*  40005 冷风开关                      */
-        case 0x04:                                         
-            slave_06.cw_switch   = rs485.RX4_buf[5];
-            CW_ctrl();
+        /*  40009   收料开关              */
+        case 0x08:
+            slave_06.MR_switch = modbus.byte_info_L;   
+            break; 
 
-            break;
+        /*  40010   保温开关               */
+        case 0x09:
+            slave_06.Insulation_switch = modbus.byte_info_L;   
+            break; 
 
-        /*  40006 收料开关                      */
-        case 0x05:                                         
-            slave_06.mr_switch   = rs485.RX4_buf[5];  
-            MR_ctrl();
+        /*  40011   保温温度              */
+        case 0x0a:
+            slave_06.Insulation_temp = modbus.byte_info_L;   
 
-            break;
+            break; 
 
-        /*  40007 同步开关                      */
-        case 0x06:                                         
-            slave_06.sync_switch   = rs485.RX4_buf[5];  
+        /*  40012   同步开关              */
+        case 0x0b:
+            slave_06.sync_switch = modbus.byte_info_L;   
 
-            break;
+            break; 
+
+        /*  40013   总开关               */
+        case 0x0c:
+            slave_06.power_switch = modbus.byte_info_L;   
+
+            break; 
 
         default:
-            break;   
+            break;
     }
 
-    slave_to_master(0x06,8);
+    slave_to_master(FUN_06,8);
 
     eeprom_data_record();
 }
@@ -250,54 +312,53 @@ void slave_to_master(uint8_t code_num,uint8_t length)
 
     switch (code_num)
     {
-        case 0x03:
-            crc = MODBUS_CRC16(rs485.TX4_buf,length);
+        case FUN_03:
+            crc = MODBUS_CRC16(rs485_4.send_buf,length);
 
-            rs485.TX4_buf[length+1] = crc;             //CRC H
-            rs485.TX4_buf[length] = crc>>8;            //CRC L
+            rs485_4.send_buf[length + 1] = crc;             //CRC H
+            rs485_4.send_buf[length]     = crc >> 8;            //CRC L
 
-            rs485.TX4_send_bytelength = length + 2;
+            rs485_4.send_bytelength = length + 2;
             
             break;
-        case 0x04:
-            crc = MODBUS_CRC16(rs485.TX4_buf,length);
+        case FUN_04:
+            crc = MODBUS_CRC16(rs485_4.send_buf,length);
 
-            rs485.TX4_buf[length+1] = crc;              //CRC H
-            rs485.TX4_buf[length] = crc>>8;             //CRC L
+            rs485_4.send_buf[length + 1] = crc;             //CRC H
+            rs485_4.send_buf[length]     = crc >> 8;            //CRC L
 
-            rs485.TX4_send_bytelength = length + 2;
+
+            rs485_4.send_bytelength = length + 2;
             
             break;    
 
-        case 0x06:
-            memcpy(rs485.TX4_buf,rs485.RX4_buf,8);
+        case FUN_06:
+            memcpy(rs485_4.send_buf,rs485_4.rcv_buf,8);
 
-            rs485.TX4_send_bytelength = length;
+            rs485_4.send_bytelength = length;
             
             break;    
 
-        case 0x10:
-            memcpy(rs485.TX4_buf,rs485.RX4_buf,6);
+        // case 0x10:
+        //     memcpy(rs485_4.send_buf,rs485_4.rcv_buf,6);
         
-            crc = MODBUS_CRC16(rs485.TX4_buf,6);
+        //     crc = MODBUS_CRC16(rs485_4.send_buf,6);
 
-            rs485.TX4_buf[7] = crc;                 //CRC H
-            rs485.TX4_buf[6] = crc>>8;              //CRC L
+        //     rs485_4.send_buf[7] = crc;                 //CRC H
+        //     rs485_4.send_buf[6] = crc>>8;              //CRC L
         
-            rs485.TX4_send_bytelength = length;
+        //     rs485_4.send_bytelength = length;
             
-            break; 
+        //     break; 
 
         default:
             break;
     }
 
-    DR4 = 1;                                 //485可以发送
-    delay_ms(2);
+    DR4_485 = 1;                                 //485可以发送
     S4CON |= S4TI;                              //开始发送
-    delay_ms(1);
+    delay_ms(2);
 }
-
 
 /**
  * @brief	crc校验函数

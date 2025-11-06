@@ -7,15 +7,21 @@
 #include "ntc.h"
 #include "stdio.h"
 
-#define PREHEAT_TEMP_ADDR   0x0000
-#define ALARM_TEMP_ADDR     0x0001      //热电偶
-#define SF24_ADDR           0x0002      //撒粉      
-#define DF24_ADDR           0x0003      //抖粉
-#define IW1_ADDR            0x0004      //吸风开关1
-#define IW2_ADDR            0x0005      //吸风开关2
-#define CW_ADDR             0X0006      //冷风
-#define MR_ADDR             0X0007      //收料
-#define SYNC_ADDR           0X0008      //同步
+#define PD_SWITCH       0x0000
+#define PD_TEMP         0x0001      //后烘干
+#define SF_SWITCH       0x0002
+#define SF_DIRECTION    0x0003      //热电偶
+#define SF_LEVEL        0x0004      //撒粉      
+#define DF_SWITCH       0x0005
+#define DF_DIRECTION    0x0006      //热电偶
+#define DF_LEVEL        0x0007      //撒粉   
+#define IW1_SWITCH      0x0008      //抖粉
+#define IW2_SWITCH      0x0009      //吸风开关1
+#define CW_SWITCH       0x000A      //吸风开关2
+#define MR_SWITCH       0X000B      //冷风
+#define INSU_SWITCH     0X000C      //收料
+#define INSU_TEMP       0X000D      //同步
+#define SYNC_SWITCH     0X000E      //收料
 
 #define EEPROM_STATU_JUDGE  0X0010         
 

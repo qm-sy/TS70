@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.7.0   GUI_CTRL                                                          10/24/2025 16:55:10 PAGE 1   
+C51 COMPILER V9.60.7.0   GUI_CTRL                                                          11/06/2025 19:53:04 PAGE 1   
 
 
 C51 COMPILER V9.60.7.0, COMPILATION OF MODULE GUI_CTRL
@@ -14,329 +14,419 @@ line level    source
    3          SP350 sp350;
    4          HANSEN hansen;
    5          DAYIN_T dayin_t;
-   6          
-   7          void sp350_parms_init( void )
-   8          {
-   9   1          Write_Dgus(0x2010,(uint16_t)sp350.F_alarm_val);
-  10   1          Write_Dgus(0x2011,(uint16_t)sp350.M_alarm_val);
-  11   1          Write_Dgus(0x2012,(uint16_t)sp350.R_alarm_val);
-  12   1          Write_Dgus(0x2013,(uint16_t)sp350.F_switch);
-  13   1          Write_Dgus(0x2014,(uint16_t)sp350.M_switch);
-  14   1          Write_Dgus(0x2015,(uint16_t)sp350.R_switch);
-  15   1          Write_Dgus(0x2016,(uint16_t)sp350.LED_switch);
-  16   1          Write_Dgus(0x2017,(uint16_t)sp350.fan_level);
-  17   1          Write_Dgus(0x2018,(uint16_t)sp350.fan_switch);
-  18   1      }
-  19          
-  20          void diwen_parms_init( void )
-  21          {
-  22   1          hansen.ctrl_flag = 0;
-  23   1          hansen.connect_flag = 0;
-  24   1          hansen.addr_0x00 = 0x00;
-  25   1          hansen.addr_0x02 = 0x00;
-  26   1          hansen.addr_0x06 = 0x0149;
-  27   1          hansen.addr_0x10 = 0x1f;
-  28   1          hansen.addr_0x20 = 0x00;
-  29   1          hansen.addr_0x21 = 0x00;
-  30   1          hansen.addr_0x22 = 0x00;
-  31   1          hansen.addr_0x23 = 0x00;
-  32   1          hansen.addr_0x2d = 0x00;
-  33   1          hansen.addr_0x30 = 0x00;
-  34   1          hansen.addr_0x0c = 0x01;
-  35   1      
-  36   1          hansen.paoji_flag = hansen.paoji_send = 0;
-  37   1          hansen.paoji_h = hansen.paoji_min = hansen.paoji_s = 0;
-  38   1          jump_page(12);
-  39   1      }
-  40          
-  41          void gui_vol_ctrl( uint16_t addr, uint8_t val_H, uint8_t val_L)
-  42          {
-  43   1          uint8_t val_tab[2] = {0};
-  44   1          uint8_t utf_tab[4] = {0XBA,0XDA,0XD4,0XB2};
-  45   1          uint8_t i = 0;
-  46   1          static uint8_t addr_20a0 = 0;
-  47   1      
-  48   1          switch ( addr )
-  49   1          {   
-  50   2              /*      0x20 马达复位：置1后开始复位，等待被置0        */
-  51   2              /*      0x20 跑机操作：置1后开始复位，等待被置0        */
-  52   2              /*      0x20 点动操作：置1一直移动，写0后停止移动      */
-  53   2              /*      0x20 bit0  x马达复位     */
-C51 COMPILER V9.60.7.0   GUI_CTRL                                                          10/24/2025 16:55:10 PAGE 2   
+   6          MC01 mc01;
+   7          
+   8          void sp350_parms_init( void )
+   9          {
+  10   1          Write_Dgus(0x2010,(uint16_t)sp350.F_alarm_val);
+  11   1          Write_Dgus(0x2011,(uint16_t)sp350.M_alarm_val);
+  12   1          Write_Dgus(0x2012,(uint16_t)sp350.R_alarm_val);
+  13   1          Write_Dgus(0x2013,(uint16_t)sp350.F_switch);
+  14   1          Write_Dgus(0x2014,(uint16_t)sp350.M_switch);
+  15   1          Write_Dgus(0x2015,(uint16_t)sp350.R_switch);
+  16   1          Write_Dgus(0x2016,(uint16_t)sp350.LED_switch);
+  17   1          Write_Dgus(0x2017,(uint16_t)sp350.fan_level);
+  18   1          Write_Dgus(0x2018,(uint16_t)sp350.fan_switch);
+  19   1      }
+  20          
+  21          void mc01_parms_init( void )
+  22          {
+  23   1          Write_Dgus(0x2103,(uint16_t)mc01.PostDry_switch);
+  24   1          Write_Dgus(0x2105,(uint16_t)mc01.PostDry_temp);
+  25   1      
+  26   1          Write_Dgus(0x2110,(uint16_t)((mc01.SF_direction << 8) | mc01.SF_switch));
+  27   1          Write_Dgus(0x2111,(uint16_t)mc01.SF_level);
+  28   1      
+  29   1          Write_Dgus(0x2112,(uint16_t)((mc01.DF_direction << 8) | mc01.DF_switch));
+  30   1          Write_Dgus(0x2113,(uint16_t)mc01.DF_level);
+  31   1      
+  32   1          Write_Dgus(0x2114,(uint16_t)((mc01.IW2_switch << 8) | mc01.IW1_switch));
+  33   1      
+  34   1          Write_Dgus(0x2115,(uint16_t)mc01.CW_switch);
+  35   1          Write_Dgus(0x2116,(uint16_t)mc01.MR_switch);
+  36   1      
+  37   1          Write_Dgus(0x2117,(uint16_t)mc01.Insulation_switch);
+  38   1          Write_Dgus(0x2118,(uint16_t)mc01.Insulation_temp);
+  39   1          
+  40   1          Write_Dgus(0x2119,(uint16_t)mc01.sync_switch);
+  41   1          Write_Dgus(0x211A,(uint16_t)mc01.power_switch);
+  42   1      }
+  43          
+  44          
+  45          void diwen_parms_init( void )
+  46          {
+  47   1          hansen.ctrl_flag = 0;
+  48   1          hansen.connect_flag = 0;
+  49   1          hansen.addr_0x00 = 0x00;
+  50   1          hansen.addr_0x02 = 0x00;
+  51   1          hansen.addr_0x06 = 0x0149;
+  52   1          hansen.addr_0x10 = 0x1f;
+  53   1          hansen.addr_0x20 = 0x00;
+C51 COMPILER V9.60.7.0   GUI_CTRL                                                          11/06/2025 19:53:04 PAGE 2   
 
-  54   2              /*      0x20 bit3  左移          */
-  55   2              /*      0x20 bit4  右移          */
-  56   2              /*      0x20 bit5  进料          */
-  57   2              /*      0x20 bit6  退料          */
-  58   2              /*      0x20 bit9  开始跑机      */
-  59   2              /*      0x20 bit13  停止跑机     */
-  60   2              case 0x2020:
-  61   2                  hansen.addr_0x20 = (val_H << 8) |  val_L;
-  62   2                  
-  63   2                  break;
-  64   2      
-  65   2              case 0x2021:
-  66   2                  hansen.addr_0x21 = (val_H << 8) |  val_L;
-  67   2                  
-  68   2                  break;
-  69   2      
-  70   2              case 0x2022:
-  71   2                  hansen.addr_0x22 = (val_H << 8) |  val_L;
-  72   2                  if( hansen.addr_0x22 == 3 )
-  73   2                  {
-  74   3                      hansen.addr_0x22 = 4;
-  75   3                  }
-  76   2                  
-  77   2                  break;   
-  78   2      
-  79   2              case 0x2023:
-  80   2                  hansen.addr_0x23 = (val_H << 8) |  val_L;
-  81   2                  
-  82   2                  break;
-  83   2      
-  84   2              case 0x2030:
-  85   2                  hansen.addr_0x30 = (val_H << 8) |  val_L;
-  86   2                  fuyin_flag = 1;
+  54   1          hansen.addr_0x21 = 0x00;
+  55   1          hansen.addr_0x22 = 0x01;
+  56   1          hansen.addr_0x23 = 0x0f;
+  57   1          hansen.addr_0x2d = 0x00;
+  58   1          hansen.addr_0x30 = 0x00;
+  59   1          hansen.addr_0x0c = 0x01;
+  60   1      
+  61   1          hansen.paoji_flag = hansen.paoji_send = 0;
+  62   1          hansen.paoji_h = hansen.paoji_min = hansen.paoji_s = 0;
+  63   1          jump_page(12);
+  64   1      }
+  65          
+  66          void gui_vol_ctrl( uint16_t addr, uint8_t val_H, uint8_t val_L)
+  67          {
+  68   1          uint8_t val_tab[2] = {0};
+  69   1          uint8_t utf_tab[4] = {0XBA,0XDA,0XD4,0XB2};
+  70   1          uint8_t i = 0;
+  71   1          static uint8_t addr_20a0 = 0;
+  72   1      
+  73   1          switch ( addr )
+  74   1          {   
+  75   2              /*      0x20 马达复位：置1后开始复位，等待被置0        */
+  76   2              /*      0x20 跑机操作：置1后开始复位，等待被置0        */
+  77   2              /*      0x20 点动操作：置1一直移动，写0后停止移动      */
+  78   2              /*      0x20 bit0  x马达复位     */
+  79   2              /*      0x20 bit3  左移          */
+  80   2              /*      0x20 bit4  右移          */
+  81   2              /*      0x20 bit5  进料          */
+  82   2              /*      0x20 bit6  退料          */
+  83   2              /*      0x20 bit9  开始跑机      */
+  84   2              /*      0x20 bit13  停止跑机     */
+  85   2              case 0x2020:
+  86   2                  hansen.addr_0x20 = (val_H << 8) |  val_L;
   87   2                  
   88   2                  break;
   89   2      
-  90   2              case 0x2051:
-  91   2                  hansen.addr_0x06 &= ~0x07;
-  92   2                  switch (val_L)
-  93   2                  {
-  94   3                      case 1: hansen.addr_0x06 |= 0x01;       break;
-  95   3                      case 2: hansen.addr_0x06 |= 0x02;       break;
-  96   3                      case 3: hansen.addr_0x06 |= 0x04;       break;
-  97   3                      default:                                break;
-  98   3                  }
-  99   2                  
- 100   2                  break;
- 101   2      
- 102   2              case 0x2052:
- 103   2                  hansen.addr_0x06 &= ~0x38;
- 104   2                  switch (val_L)
- 105   2                  {
- 106   3                      case 1: hansen.addr_0x06 |= 0x08;       break;
- 107   3                      case 2: hansen.addr_0x06 |= 0x10;       break;
- 108   3                      case 3: hansen.addr_0x06 |= 0x20;       break;
- 109   3                      default:                                break;
- 110   3                  }
- 111   2                  
- 112   2                  break;
- 113   2      
- 114   2              case 0x2053:
- 115   2                  hansen.addr_0x06 &= ~0xC0;
-C51 COMPILER V9.60.7.0   GUI_CTRL                                                          10/24/2025 16:55:10 PAGE 3   
+  90   2              case 0x2021:
+  91   2                  hansen.addr_0x21 = (val_H << 8) |  val_L;
+  92   2                  
+  93   2                  break;
+  94   2      
+  95   2              case 0x2022:
+  96   2                  hansen.addr_0x22 = (val_H << 8) |  val_L;
+  97   2        
+  98   2                  break;   
+  99   2      
+ 100   2              case 0x2023:
+ 101   2                  hansen.addr_0x23 = (val_H << 8) |  val_L;
+ 102   2                  
+ 103   2                  break;
+ 104   2      
+ 105   2              case 0x2030:
+ 106   2                  hansen.addr_0x30 = (val_H << 8) |  val_L;
+ 107   2                  fuyin_flag = 1;
+ 108   2                  
+ 109   2                  break;
+ 110   2      
+ 111   2              case 0x2051:
+ 112   2                  hansen.addr_0x06 &= ~0x07;
+ 113   2                  switch (val_L)
+ 114   2                  {
+ 115   3                      case 1: hansen.addr_0x06 |= 0x01;       break;
+C51 COMPILER V9.60.7.0   GUI_CTRL                                                          11/06/2025 19:53:04 PAGE 3   
 
- 116   2                  switch (val_L)
- 117   2                  {
- 118   3                      case 1: hansen.addr_0x06 |= 0x40;       break;
- 119   3                      case 2: hansen.addr_0x06 |= 0x80;       break;
- 120   3                      case 3: hansen.addr_0x06 |= 0xc0;       break;
- 121   3                      default:                                break;
- 122   3                  }
- 123   2                  
- 124   2                  break;
- 125   2      
- 126   2              case 0x2054:
- 127   2                  hansen.addr_0x06 &= ~0x0700;
- 128   2                  switch (val_L)
- 129   2                  {
- 130   3                      case 1: hansen.addr_0x06 |= 0x0100;     break;
- 131   3                      case 2: hansen.addr_0x06 |= 0x0200;     break;
- 132   3                      case 3: hansen.addr_0x06 |= 0x0400;     break;
- 133   3                      default:                                break;
- 134   3                  }
- 135   2                  
- 136   2                  break;
- 137   2      
- 138   2              case 0x2055:
- 139   2                  hansen.addr_0x06 &= ~0x1800;
- 140   2                  switch (val_L)
- 141   2                  {
- 142   3                      case 0: hansen.addr_0x06 |= 0x0000;     break;
- 143   3                      case 1: hansen.addr_0x06 |= 0x0800;     break;
- 144   3                      case 2: hansen.addr_0x06 |= 0x1000;     break;
- 145   3                      case 3: hansen.addr_0x06 |= 0x1800;     break;
- 146   3                      default:                                break;
- 147   3                  }
- 148   2                  
- 149   2                  break;
- 150   2      
- 151   2              case 0x2060:
- 152   2                  hansen.addr_0x00 = (val_H << 8) |  val_L;
- 153   2                  
- 154   2                  break;
- 155   2      
- 156   2              case 0x2062:
- 157   2                  hansen.addr_0x02 = (val_H << 8) |  val_L;
- 158   2                  
- 159   2                  break;
- 160   2      
- 161   2              case 0x2033:
- 162   2      
- 163   2                  Write_Dgusii_Vp_byChar(0x20c0,utf_tab,4);
- 164   2      
- 165   2                  break;
- 166   2      
- 167   2              case 0x2090:
- 168   2                  addr_20a0 = 0;
- 169   2                  break;
- 170   2      
- 171   2              case 0x2098:
- 172   2                  if( mima_val == 222222 )
- 173   2                  {
- 174   3                      jump_page(10);
- 175   3                      mima_val = 0;
- 176   3                      Write_Dgus(0x2090,0x01);
- 177   3                      Write_Dgus(0x2091,0xe240);
-C51 COMPILER V9.60.7.0   GUI_CTRL                                                          10/24/2025 16:55:10 PAGE 4   
+ 116   3                      case 2: hansen.addr_0x06 |= 0x02;       break;
+ 117   3                      case 4: hansen.addr_0x06 |= 0x04;       break;
+ 118   3                      default:                                break;
+ 119   3                  }
+ 120   2                  
+ 121   2                  break;
+ 122   2      
+ 123   2              case 0x2052:
+ 124   2                  hansen.addr_0x06 &= ~0x38;
+ 125   2                  switch (val_L)
+ 126   2                  {
+ 127   3                      case 1: hansen.addr_0x06 |= 0x08;       break;
+ 128   3                      case 2: hansen.addr_0x06 |= 0x10;       break;
+ 129   3                      case 4: hansen.addr_0x06 |= 0x20;       break;
+ 130   3                      default:                                break;
+ 131   3                  }
+ 132   2                  
+ 133   2                  break;
+ 134   2      
+ 135   2              case 0x2053:
+ 136   2                  hansen.addr_0x06 &= ~0xC0;
+ 137   2                  switch (val_L)
+ 138   2                  {
+ 139   3                      case 1: hansen.addr_0x06 |= 0x40;       break;
+ 140   3                      case 2: hansen.addr_0x06 |= 0x80;       break;
+ 141   3                      case 4: hansen.addr_0x06 |= 0xc0;       break;
+ 142   3                      default:                                break;
+ 143   3                  }
+ 144   2                  
+ 145   2                  break;
+ 146   2      
+ 147   2              case 0x2054:
+ 148   2                  hansen.addr_0x06 &= ~0x0700;
+ 149   2                  switch (val_L)
+ 150   2                  {
+ 151   3                      case 1: hansen.addr_0x06 |= 0x0100;     break;
+ 152   3                      case 2: hansen.addr_0x06 |= 0x0200;     break;
+ 153   3                      case 4: hansen.addr_0x06 |= 0x0400;     break;
+ 154   3                      default:                                break;
+ 155   3                  }
+ 156   2                  
+ 157   2                  break;
+ 158   2      
+ 159   2              case 0x2055:
+ 160   2                  hansen.addr_0x06 &= ~0x1800;
+ 161   2                  switch (val_L)
+ 162   2                  {
+ 163   3                      case 1: hansen.addr_0x06 |= 0x0000;     break;
+ 164   3                      case 2: hansen.addr_0x06 |= 0x0800;     break;
+ 165   3                      case 4: hansen.addr_0x06 |= 0x1000;     break;
+ 166   3                      case 8: hansen.addr_0x06 |= 0x1800;     break;
+ 167   3                      default:                                break;
+ 168   3                  }
+ 169   2                  
+ 170   2                  break;
+ 171   2      
+ 172   2              case 0x2060:
+ 173   2                  hansen.addr_0x00 = (val_H << 8) |  val_L;
+ 174   2                  
+ 175   2                  break;
+ 176   2      
+ 177   2              case 0x2062:
+C51 COMPILER V9.60.7.0   GUI_CTRL                                                          11/06/2025 19:53:04 PAGE 4   
 
- 178   3                  } 
- 179   2                 
+ 178   2                  hansen.addr_0x02 = (val_H << 8) |  val_L;
+ 179   2                  
  180   2                  break;
  181   2      
- 182   2              case 0x20a0:
- 183   2                  if( val_L == 1 ) 
- 184   2                  {
- 185   3                      hansen.addr_0x20 = 0x0200;
- 186   3                      hansen.paoji_flag = 1;
- 187   3                  }else
- 188   2                  {
- 189   3                      hansen.addr_0x20 = 0x2000;
- 190   3                      Write_Dgus(0x20a4,0);
- 191   3                      Write_Dgus(0x20a3,0);
- 192   3                      Write_Dgus(0x20a2,0);
- 193   3                      jump_page(0);
- 194   3                      hansen.paoji_flag = 0;
- 195   3                  }  
- 196   2                  addr_20a0 = val_L;
- 197   2      
- 198   2                  break;
- 199   2      
- 200   2              case 0x20d6:
- 201   2                  if( val_L == 4 )
- 202   2                  {
- 203   3                      hansen.addr_0x2d = 3;    
- 204   3                  }
- 205   2                  if( val_L == 3 )
- 206   2                  {
- 207   3                      hansen.addr_0x2d = 4;    
- 208   3                  }
- 209   2                  break;
- 210   2      
- 211   2              case 0x20d7:
- 212   2                  if(hansen.addr_0x2d == 3 )
- 213   2                  {
- 214   3                      hansen.addr_0x21 = 1;
- 215   3                      Write_Dgusii_Vp_byChar(0x1600,"印中清洗",8);
- 216   3                  }
- 217   2      
- 218   2                  break;  
- 219   2      
- 220   2              case 0x20d8:
- 221   2                  hansen.addr_0x2d = val_L;
- 222   2                  jump_page(0);
- 223   2                  break;
- 224   2      
- 225   2              case 0x20a1:
- 226   2                  if( addr_20a0 == 0 )
- 227   2                  jump_page(0);
- 228   2                  break;
- 229   2              /*          40001 设置F_alarm_val(val_L) M_alarm_val(val_H)          */
- 230   2              case 0x2010:
- 231   2                  sp350.F_alarm_val = val_L;
- 232   2                  write_slave_06(F_TEMP_ALARM,0,sp350.F_alarm_val);  
- 233   2      
- 234   2                  break;
- 235   2              
- 236   2              case 0x2011:
- 237   2                  sp350.M_alarm_val = val_L;
- 238   2                  write_slave_06(M_TEMP_ALARM,0,sp350.M_alarm_val);    
- 239   2      
-C51 COMPILER V9.60.7.0   GUI_CTRL                                                          10/24/2025 16:55:10 PAGE 5   
+ 182   2              case 0x2033:
+ 183   2      
+ 184   2                  Write_Dgusii_Vp_byChar(0x20c0,utf_tab,4);
+ 185   2      
+ 186   2                  break;
+ 187   2      
+ 188   2              case 0x2090:
+ 189   2                  addr_20a0 = 0;
+ 190   2                  break;
+ 191   2      
+ 192   2              case 0x2098:
+ 193   2                  if( mima_val == 222222 )
+ 194   2                  {
+ 195   3                      jump_page(10);
+ 196   3                      mima_val = 0;
+ 197   3                      Write_Dgus(0x2090,0x01);
+ 198   3                      Write_Dgus(0x2091,0xe240);
+ 199   3                  } 
+ 200   2                 
+ 201   2                  break;
+ 202   2      
+ 203   2              case 0x20a0:
+ 204   2                  if( val_L == 1 ) 
+ 205   2                  {
+ 206   3                      hansen.addr_0x20 = 0x0200;
+ 207   3                      hansen.paoji_flag = 1;
+ 208   3                  }else
+ 209   2                  {
+ 210   3                      hansen.addr_0x20 = 0x2000;
+ 211   3                      Write_Dgus(0x20a4,0);
+ 212   3                      Write_Dgus(0x20a3,0);
+ 213   3                      Write_Dgus(0x20a2,0);
+ 214   3                      jump_page(0);
+ 215   3                      hansen.paoji_flag = 0;
+ 216   3                  }  
+ 217   2                  addr_20a0 = val_L;
+ 218   2      
+ 219   2                  break;
+ 220   2      
+ 221   2              case 0x20d6:
+ 222   2                  if( val_L == 4 )
+ 223   2                  {
+ 224   3                      hansen.addr_0x2d = 3;    
+ 225   3                  }
+ 226   2                  if( val_L == 3 )
+ 227   2                  {
+ 228   3                      hansen.addr_0x2d = 4;    
+ 229   3                  }
+ 230   2                  break;
+ 231   2      
+ 232   2              case 0x20d7:
+ 233   2                  if(hansen.addr_0x2d == 3 )
+ 234   2                  {
+ 235   3                      hansen.addr_0x21 = 1;
+ 236   3                      Write_Dgusii_Vp_byChar(0x1600,"印中清洗",8);
+ 237   3                  }
+ 238   2      
+ 239   2                  break;  
+C51 COMPILER V9.60.7.0   GUI_CTRL                                                          11/06/2025 19:53:04 PAGE 5   
 
- 240   2                  break;
- 241   2      
- 242   2              case 0x2012:
- 243   2                  sp350.R_alarm_val = val_L;
- 244   2                  write_slave_06(R_TEMP_ALARM,0,sp350.R_alarm_val);  
- 245   2                  
- 246   2                  break;
- 247   2      
- 248   2               
- 249   2              /*          40002 设置 F\M\R  Switch                                 */
- 250   2              case 0x2013:
- 251   2                  sp350.F_switch = val_L;
- 252   2                  write_slave_06(F_AC_SWITCH,0,sp350.F_switch);  
- 253   2      
- 254   2                  break;
- 255   2              
- 256   2              case 0x2014:
- 257   2                  sp350.M_switch = val_L;
- 258   2                  write_slave_06(M_AC_SWITCH,0,sp350.M_switch); 
- 259   2      
- 260   2                  break;
- 261   2      
- 262   2              case 0x2015:
- 263   2                  sp350.R_switch = val_L;
- 264   2                  write_slave_06(R_AC_SWITCH,0,sp350.R_switch); 
- 265   2      
- 266   2                  break;
- 267   2      
- 268   2              case 0x2016:
- 269   2                  sp350.LED_switch = val_L;
- 270   2                  write_slave_06(LED_ADDR,0,sp350.LED_switch); 
- 271   2      
- 272   2                  break;
- 273   2      
- 274   2              case 0x2017:
- 275   2                  sp350.fan_level = val_L;
- 276   2                  write_slave_06(FAN_ADDR,0,sp350.fan_level); 
- 277   2      
- 278   2                  break; 
- 279   2      
- 280   2              case 0x2018:
- 281   2                  sp350.fan_switch = val_L;
- 282   2                  write_slave_06(FAN_SWITCH,0,sp350.fan_switch); 
- 283   2      
- 284   2                  break; 
- 285   2      
- 286   2              default:
+ 240   2      
+ 241   2              case 0x20d8:
+ 242   2                  hansen.addr_0x2d = val_L;
+ 243   2                  jump_page(0);
+ 244   2                  break;
+ 245   2      
+ 246   2              case 0x20a1:
+ 247   2                  if( addr_20a0 == 0 )
+ 248   2                  jump_page(0);
+ 249   2                  break;
+ 250   2              /*          40001 设置F_alarm_val(val_L) M_alarm_val(val_H)          */
+ 251   2              case 0x2010:
+ 252   2                  sp350.F_alarm_val = val_L;
+ 253   2                  write_slave_06(F_TEMP_ALARM,0,sp350.F_alarm_val);  
+ 254   2      
+ 255   2                  break;
+ 256   2              
+ 257   2              case 0x2011:
+ 258   2                  sp350.M_alarm_val = val_L;
+ 259   2                  write_slave_06(M_TEMP_ALARM,0,sp350.M_alarm_val);    
+ 260   2      
+ 261   2                  break;
+ 262   2      
+ 263   2              case 0x2012:
+ 264   2                  sp350.R_alarm_val = val_L;
+ 265   2                  write_slave_06(R_TEMP_ALARM,0,sp350.R_alarm_val);  
+ 266   2                  
+ 267   2                  break;
+ 268   2      
+ 269   2               
+ 270   2              /*          40002 设置 F\M\R  Switch                                 */
+ 271   2              case 0x2013:
+ 272   2                  sp350.F_switch = val_L;
+ 273   2                  write_slave_06(F_AC_SWITCH,0,sp350.F_switch);  
+ 274   2      
+ 275   2                  break;
+ 276   2              
+ 277   2              case 0x2014:
+ 278   2                  sp350.M_switch = val_L;
+ 279   2                  write_slave_06(M_AC_SWITCH,0,sp350.M_switch); 
+ 280   2      
+ 281   2                  break;
+ 282   2      
+ 283   2              case 0x2015:
+ 284   2                  sp350.R_switch = val_L;
+ 285   2                  write_slave_06(R_AC_SWITCH,0,sp350.R_switch); 
+ 286   2      
  287   2                  break;
- 288   2          }
- 289   1      }
- 290          
- 291          
- 292          void jump_page( uint8_t page_num )
- 293          {
- 294   1          Write_Dgus(0x0085,page_num);
- 295   1      
- 296   1          Write_Dgus(0x0084,0x5A01);
- 297   1      }
- 298          
- 299          void time_trans( uint16_t time_val ,uint8_t num )
- 300          {
- 301   1          if( num == 0 )
-C51 COMPILER V9.60.7.0   GUI_CTRL                                                          10/24/2025 16:55:10 PAGE 6   
+ 288   2      
+ 289   2              case 0x2016:
+ 290   2                  sp350.LED_switch = val_L;
+ 291   2                  write_slave_06(LED_ADDR,0,sp350.LED_switch); 
+ 292   2      
+ 293   2                  break;
+ 294   2      
+ 295   2              case 0x2017:
+ 296   2                  sp350.fan_level = val_L;
+ 297   2                  write_slave_06(FAN_ADDR,0,sp350.fan_level); 
+ 298   2      
+ 299   2                  break; 
+ 300   2      
+ 301   2              case 0x2018:
+C51 COMPILER V9.60.7.0   GUI_CTRL                                                          11/06/2025 19:53:04 PAGE 6   
 
- 302   1          {
- 303   2              dayin_t.cnt_h = time_val / 3600;
- 304   2              dayin_t.cnt_min = (time_val % 3600) / 60;
- 305   2              dayin_t.cnt_s = time_val % 60;
- 306   2          }else
- 307   1          {
- 308   2              dayin_t.remain_h = time_val / 3600;
- 309   2              dayin_t.remain_min = (time_val % 3600) / 60;
- 310   2              dayin_t.remain_s = time_val % 60;
- 311   2          }
- 312   1      }
+ 302   2                  sp350.fan_switch = val_L;
+ 303   2                  write_slave_06(FAN_SWITCH,0,sp350.fan_switch); 
+ 304   2      
+ 305   2                  break; 
+ 306   2      
+ 307   2              case 0x2100:
+ 308   2      
+ 309   2                  break;
+ 310   2      
+ 311   2              case 0x2101:
+ 312   2      
+ 313   2                  break;
+ 314   2      
+ 315   2              case 0x2102:
+ 316   2      
+ 317   2                  break;
+ 318   2      
+ 319   2              case 0x2103:
+ 320   2                  write_slave_06_MC01(0x00,val_H,val_L);
+ 321   2                  break;
+ 322   2      
+ 323   2              case 0x2104:
+ 324   2      
+ 325   2                  break;
+ 326   2      
+ 327   2              case 0x2105:
+ 328   2                  write_slave_06_MC01(0x01,val_H,val_L);
+ 329   2                  break;
+ 330   2      
+ 331   2              case 0x2110:
+ 332   2                  write_slave_06_MC01(0x02,val_H,val_L);
+ 333   2                  break;
+ 334   2      
+ 335   2              case 0x2111:
+ 336   2                  write_slave_06_MC01(0x03,val_H,val_L);
+ 337   2                  break;
+ 338   2      
+ 339   2              case 0x2112:
+ 340   2                  write_slave_06_MC01(0x04,val_H,val_L);
+ 341   2                  break;
+ 342   2      
+ 343   2              case 0x2113:
+ 344   2                  write_slave_06_MC01(0x05,val_H,val_L);
+ 345   2                  break;
+ 346   2      
+ 347   2              case 0x2114:
+ 348   2                  write_slave_06_MC01(0x06,val_H,val_L);
+ 349   2                  break;
+ 350   2      
+ 351   2              case 0x2115:
+ 352   2                  write_slave_06_MC01(0x07,val_H,val_L);
+ 353   2                  break;
+ 354   2      
+ 355   2              case 0x2116:
+ 356   2                  write_slave_06_MC01(0x08,val_H,val_L);
+ 357   2                  break;
+ 358   2      
+ 359   2              case 0x2117:
+ 360   2                  write_slave_06_MC01(0x09,val_H,val_L);
+ 361   2                  break;
+ 362   2      
+ 363   2              case 0x2118:
+C51 COMPILER V9.60.7.0   GUI_CTRL                                                          11/06/2025 19:53:04 PAGE 7   
+
+ 364   2                  write_slave_06_MC01(0x0a,val_H,val_L);
+ 365   2                  break;
+ 366   2      
+ 367   2              case 0x2119:
+ 368   2                  write_slave_06_MC01(0x0b,val_H,val_L);
+ 369   2                  break;
+ 370   2      
+ 371   2              case 0x211a:
+ 372   2                  write_slave_06_MC01(0x0c,val_H,val_L);
+ 373   2                  break;
+ 374   2              default:
+ 375   2                  break;
+ 376   2          }
+ 377   1      }
+ 378          
+ 379          
+ 380          void jump_page( uint8_t page_num )
+ 381          {
+ 382   1          Write_Dgus(0x0085,page_num);
+ 383   1      
+ 384   1          Write_Dgus(0x0084,0x5A01);
+ 385   1      }
+ 386          
+ 387          void time_trans( uint16_t time_val ,uint8_t num )
+ 388          {
+ 389   1          if( num == 0 )
+ 390   1          {
+ 391   2              dayin_t.cnt_h = time_val / 3600;
+ 392   2              dayin_t.cnt_min = (time_val % 3600) / 60;
+ 393   2              dayin_t.cnt_s = time_val % 60;
+ 394   2          }else
+ 395   1          {
+ 396   2              dayin_t.remain_h = time_val / 3600;
+ 397   2              dayin_t.remain_min = (time_val % 3600) / 60;
+ 398   2              dayin_t.remain_s = time_val % 60;
+ 399   2          }
+ 400   1      }
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =   1385    ----
+   CODE SIZE        =   1818    ----
    CONSTANT SIZE    =     15    ----
-   XDATA SIZE       =    124      11
+   XDATA SIZE       =    145      11
    PDATA SIZE       =   ----    ----
    DATA SIZE        =   ----    ----
    IDATA SIZE       =   ----    ----

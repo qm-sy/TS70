@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.7.0   EEPROM_CRL                                                        09/24/2025 09:13:48 PAGE 1   
+C51 COMPILER V9.60.7.0   EEPROM_CRL                                                        11/06/2025 19:23:32 PAGE 1   
 
 
 C51 COMPILER V9.60.7.0, COMPILATION OF MODULE EEPROM_CRL
@@ -26,90 +26,108 @@ line level    source
   15   1      
   16   1          if( eeprom_statu_flag != 0x58 )
   17   1          {
-  18   2              slave_06.tc_preheat_temp    = 60;
-  19   2              slave_06.tc_alarm_temp      = 80;
-  20   2              slave_06.sf_level           = 30;
-  21   2              slave_06.df_level           = 30;
-  22   2              slave_06.iw1_switch         = 1;
-  23   2              slave_06.iw2_switch         = 1;
-  24   2              slave_06.cw_switch          = 1;
-  25   2              slave_06.mr_switch          = 1;
-  26   2              slave_06.sync_switch        = 1;
-  27   2      
-  28   2              eeprom_data_record(); 
-  29   2          }
-  30   1          eeprom_data_init();    
-  31   1      }
-  32          
-  33          /**
-  34           * @brief 主机更改参数后写入
-  35           *
-  36           * @param   
-  37           *
-  38           * @return  void
-  39          **/
-  40          void eeprom_data_record( void )
-  41          {
-  42   1          ISP_Earse(0x0000);
-  43   1      
-  44   1          ISP_Write(PREHEAT_TEMP_ADDR,slave_06.tc_preheat_temp);
-  45   1          ISP_Write(ALARM_TEMP_ADDR,slave_06.tc_alarm_temp);
-  46   1          ISP_Write(SF24_ADDR,slave_06.sf_level);
-  47   1          ISP_Write(DF24_ADDR,slave_06.df_level);
-  48   1          ISP_Write(IW1_ADDR,slave_06.iw1_switch);
-  49   1          ISP_Write(IW2_ADDR,slave_06.iw2_switch);
-  50   1          ISP_Write(CW_ADDR,slave_06.cw_switch);
-  51   1          ISP_Write(MR_ADDR,slave_06.mr_switch);
-  52   1          ISP_Write(SYNC_ADDR,slave_06.sync_switch);
-  53   1      
-C51 COMPILER V9.60.7.0   EEPROM_CRL                                                        09/24/2025 09:13:48 PAGE 2   
+  18   2              slave_06.PostDry_switch     = 1;
+  19   2              slave_06.PostDry_temp       = 80;
+  20   2              slave_06.SF_switch          = 1;
+  21   2              slave_06.SF_direction       = 0;
+  22   2              slave_06.SF_level           = 30;
+  23   2              slave_06.DF_switch          = 1;
+  24   2              slave_06.DF_direction       = 0;
+  25   2              slave_06.DF_level           = 30;
+  26   2              slave_06.IW1_switch         = 1;
+  27   2              slave_06.IW2_switch         = 1;
+  28   2              slave_06.CW_switch          = 1;
+  29   2              slave_06.MR_switch          = 1;
+  30   2              slave_06.Insulation_switch  = 1;
+  31   2              slave_06.Insulation_temp    = 80;
+  32   2              slave_06.sync_switch        = 0;
+  33   2      
+  34   2              eeprom_data_record(); 
+  35   2          }
+  36   1          eeprom_data_init();    
+  37   1      }
+  38          
+  39          /**
+  40           * @brief 主机更改参数后写入
+  41           *
+  42           * @param   
+  43           *
+  44           * @return  void
+  45          **/
+  46          void eeprom_data_record( void )
+  47          {
+  48   1          ISP_Earse(0x0000);
+  49   1      
+  50   1          ISP_Write(PD_SWITCH,slave_06.PostDry_switch);
+  51   1          ISP_Write(PD_TEMP,slave_06.PostDry_temp);
+  52   1          ISP_Write(SF_SWITCH,slave_06.SF_switch);
+  53   1          ISP_Write(SF_DIRECTION,slave_06.SF_direction);
+C51 COMPILER V9.60.7.0   EEPROM_CRL                                                        11/06/2025 19:23:32 PAGE 2   
 
-  54   1          ISP_Write(EEPROM_STATU_JUDGE,0x58);
-  55   1      
-  56   1          delay_ms(10);
-  57   1      }
-  58          
-  59          
-  60          /**
-  61           * @brief eeprom 数据初始化
-  62           *
-  63           * @param   
-  64           *
-  65           * @return  void
-  66          **/
-  67          void eeprom_data_init( void )
-  68          {
-  69   1          slave_06.tc_preheat_temp = ISP_Read(PREHEAT_TEMP_ADDR);
-  70   1      
-  71   1          slave_06.tc_alarm_temp   = ISP_Read(ALARM_TEMP_ADDR);
-  72   1      
-  73   1          slave_06.sf_level        = ISP_Read(SF24_ADDR);
-  74   1      
-  75   1          slave_06.df_level        = ISP_Read(DF24_ADDR);
-  76   1      
-  77   1          slave_06.iw1_switch      = ISP_Read(IW1_ADDR);
-  78   1          slave_06.iw2_switch      = ISP_Read(IW2_ADDR);
-  79   1          IW_ctrl();
-  80   1      
-  81   1          slave_06.cw_switch       = ISP_Read(CW_ADDR);
-  82   1          CW_ctrl();
+  54   1          ISP_Write(SF_LEVEL,slave_06.SF_level);
+  55   1          ISP_Write(DF_SWITCH,slave_06.DF_switch);
+  56   1          ISP_Write(DF_DIRECTION,slave_06.DF_direction);
+  57   1          ISP_Write(DF_LEVEL,slave_06.DF_level);
+  58   1          ISP_Write(IW1_SWITCH,slave_06.IW1_switch);
+  59   1          ISP_Write(IW2_SWITCH,slave_06.IW2_switch);
+  60   1          ISP_Write(CW_SWITCH,slave_06.CW_switch);
+  61   1          ISP_Write(MR_SWITCH,slave_06.MR_switch);
+  62   1          ISP_Write(INSU_SWITCH,slave_06.Insulation_switch);
+  63   1          ISP_Write(INSU_TEMP,slave_06.Insulation_temp);
+  64   1          ISP_Write(SYNC_SWITCH,slave_06.sync_switch);
+  65   1      
+  66   1          ISP_Write(EEPROM_STATU_JUDGE,0x58);
+  67   1      
+  68   1          delay_ms(10);
+  69   1      }
+  70          
+  71          
+  72          /**
+  73           * @brief eeprom 数据初始化
+  74           *
+  75           * @param   
+  76           *
+  77           * @return  void
+  78          **/
+  79          void eeprom_data_init( void )
+  80          {
+  81   1          slave_06.PostDry_switch     = ISP_Read(PD_SWITCH);
+  82   1          slave_06.PostDry_temp       = ISP_Read(PD_TEMP);
   83   1      
-  84   1          slave_06.mr_switch       = ISP_Read(MR_ADDR);
-  85   1          MR_ctrl();
-  86   1      
-  87   1          slave_06.sync_switch     = ISP_Read(SYNC_ADDR);
-  88   1      
-  89   1          PN1_24V = DD_24V = PN2_24V = 1;
-  90   1      }
+  84   1          slave_06.SF_switch          = ISP_Read(SF_SWITCH);
+  85   1          slave_06.SF_direction       = ISP_Read(SF_DIRECTION);
+  86   1          slave_06.SF_level           = ISP_Read(SF_LEVEL);
+  87   1      
+  88   1          slave_06.DF_switch          = ISP_Read(DF_SWITCH);
+  89   1          slave_06.DF_direction       = ISP_Read(DF_DIRECTION);
+  90   1          slave_06.DF_level           = ISP_Read(DF_LEVEL);
+  91   1      
+  92   1          slave_06.IW1_switch         = ISP_Read(IW1_SWITCH);
+  93   1          slave_06.IW2_switch         = ISP_Read(IW2_SWITCH);
+  94   1          IW_ctrl();
+  95   1      
+  96   1          slave_06.CW_switch          = ISP_Read(CW_SWITCH);
+  97   1      
+  98   1          slave_06.MR_switch          = ISP_Read(MR_SWITCH);
+  99   1      
+ 100   1          slave_06.Insulation_switch  = ISP_Read(INSU_SWITCH);
+ 101   1          slave_06.Insulation_temp    = ISP_Read(INSU_TEMP);
+ 102   1      
+ 103   1          slave_06.sync_switch        = ISP_Read(SYNC_SWITCH);
+ 104   1      
+ 105   1          slave_06.power_switch       = 1;
+ 106   1      }
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =    302    ----
+   CODE SIZE        =    457    ----
    CONSTANT SIZE    =   ----    ----
    XDATA SIZE       =   ----    ----
    PDATA SIZE       =   ----    ----
    DATA SIZE        =   ----    ----
    IDATA SIZE       =   ----    ----
+C51 COMPILER V9.60.7.0   EEPROM_CRL                                                        11/06/2025 19:23:32 PAGE 3   
+
    BIT SIZE         =   ----    ----
 END OF MODULE INFORMATION.
 

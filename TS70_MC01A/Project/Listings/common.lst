@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.7.0   COMMON                                                            09/24/2025 09:13:48 PAGE 1   
+C51 COMPILER V9.60.7.0   COMMON                                                            11/06/2025 19:23:33 PAGE 1   
 
 
 C51 COMPILER V9.60.7.0, COMPILATION OF MODULE COMMON
@@ -21,62 +21,93 @@ line level    source
   10          void Tim3_ISR( void ) interrupt 19
   11          {
   12   1          static uint16_t temp_scan_cnt = 0;
-  13   1      
-  14   1          /* 3, temp 上报 1s/次                             */
-  15   1          if( temp.scan_flag == 0 )
-  16   1          {
-  17   2              temp_scan_cnt++;
-  18   2              if( temp_scan_cnt == 100 )
-  19   2              {
-  20   3                  temp.scan_flag = 1;
-  21   3                  temp_scan_cnt  = 0;
-  22   3              }
-  23   2          }
-  24   1      
-  25   1      }
-  26          
-  27          /**
-  28           * @brief Timer1中断处理函数
-  29           *
-  30           * @param   
-  31           *
-  32           * @return  void
-  33          **/
-  34          void Tim1_ISR( void ) interrupt 3   //100us
-  35          {
-  36   1          static uint16_t sf_cnt = 0;
-  37   1          static uint16_t df_cnt = 0;
-  38   1      
-  39   1          sf_cnt++;
-  40   1          if( sf_cnt == slave_06.sf_level )
-  41   1          {
-  42   2              SF_24V = 0;
-  43   2          }
-  44   1          if( sf_cnt == 100 )
-  45   1          {
-  46   2              SF_24V = 1;
-  47   2              sf_cnt = 0;
-  48   2          }
-  49   1      
-  50   1          df_cnt++;
-  51   1          if( df_cnt == slave_06.df_level )
-  52   1          {
-  53   2              DF_24V = 0;
-C51 COMPILER V9.60.7.0   COMMON                                                            09/24/2025 09:13:48 PAGE 2   
+  13   1          static uint16_t signal_cnt = 0;
+  14   1      
+  15   1          /* 3, temp 上报 1s/次                             */
+  16   1          if( temp.scan_flag == 0 )
+  17   1          {
+  18   2              temp_scan_cnt++;
+  19   2              if( temp_scan_cnt == 100 )
+  20   2              {
+  21   3                  temp.scan_flag = 1;
+  22   3                  temp_scan_cnt  = 0;
+  23   3              }
+  24   2          }
+  25   1      
+  26   1          signal_cnt++;
+  27   1          if( Sensor_3 == 0 )
+  28   1          {
+  29   2              power_ctrl.signal_flag = 1;
+  30   2              signal_cnt = 0;
+  31   2          }else
+  32   1          {
+  33   2              if( signal_cnt == 500 )
+  34   2              {
+  35   3                  power_ctrl.signal_flag = 0;
+  36   3                  signal_cnt = 0;
+  37   3              }
+  38   2          }
+  39   1      }
+  40          
+  41          /**
+  42           * @brief Timer1中断处理函数
+  43           *
+  44           * @param   
+  45           *
+  46           * @return  void
+  47          **/
+  48          void Tim1_ISR( void ) interrupt 3   //100us
+  49          {
+  50   1          static uint16_t sf_cnt = 0;
+  51   1          static uint16_t df_cnt = 0;
+  52   1      
+  53   1      
+C51 COMPILER V9.60.7.0   COMMON                                                            11/06/2025 19:23:33 PAGE 2   
 
-  54   2          }
-  55   1          if( df_cnt == 100 )
+  54   1      
+  55   1          if( power_ctrl.SF_enable == 1 )
   56   1          {
-  57   2              DF_24V = 1;
-  58   2              df_cnt = 0;
-  59   2          }
-  60   1      }
+  57   2              sf_cnt++;
+  58   2              if( sf_cnt == slave_06.SF_level )
+  59   2              {
+  60   3                  SF_24V = 0;
+  61   3              }
+  62   2              if( sf_cnt == 100 )
+  63   2              {
+  64   3                  SF_24V = 1;
+  65   3                  sf_cnt = 0;
+  66   3              }
+  67   2          }else
+  68   1          {
+  69   2              SF_24V = 0;
+  70   2              sf_cnt = 0;
+  71   2          }
+  72   1      
+  73   1          if( power_ctrl.DF_enable == 1 )
+  74   1          {
+  75   2              df_cnt++;
+  76   2              if( df_cnt == slave_06.DF_level )
+  77   2              {
+  78   3                  DF_24V = 0;
+  79   3              }
+  80   2              if( df_cnt == 100 )
+  81   2              {
+  82   3                  DF_24V = 1;
+  83   3                  df_cnt = 0;
+  84   3              }
+  85   2          }else
+  86   1          {
+  87   2              DF_24V = 0;
+  88   2              df_cnt = 0;
+  89   2          }
+  90   1      
+  91   1      }
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =    197    ----
+   CODE SIZE        =    283    ----
    CONSTANT SIZE    =   ----    ----
-   XDATA SIZE       =      6    ----
+   XDATA SIZE       =      8    ----
    PDATA SIZE       =   ----    ----
    DATA SIZE        =   ----    ----
    IDATA SIZE       =   ----    ----

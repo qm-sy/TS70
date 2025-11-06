@@ -25,13 +25,12 @@ void main( void )
     
     EA = 1;     //中断总开关
     printf("========== code start ========== \r\n");
-
+    WK_220V = 1;
+    temp.scan_flag = 0;
     while (1)
     {
         Modbus_Event();
-
+        ac_dc_ctrl();
         temp_scan();
-        sync_ctrl();  
-
     }  
 }
