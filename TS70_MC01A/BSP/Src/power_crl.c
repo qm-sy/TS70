@@ -22,33 +22,6 @@ void temp_scan( void )
 }
 
 /**
- * @brief 吸风开关控制（继电器） x2
- *
- * @param[in] 
- * 
- * @return  
- * 
-**/
-void IW_ctrl( void )
-{
-    if( slave_06.IW1_switch == 1 )
-    {
-        IW_1 = 1;
-    }else
-    {
-        IW_1 = 0;
-    }
-
-    // if( slave_06.IW2_switch == 1 )
-    // {
-    //     IW_2 = 1;
-    // }else
-    // {
-    //     IW_2 = 0;
-    // }
-}
-
-/**
  * @brief AC DC输出使能控制
  *
  * @param[in] 
@@ -75,20 +48,26 @@ void ac_dc_ctrl( void )
                                                   (slave_06.SF_switch == 1))   //撒粉开关打开
                                                   ? ENABLE : DISABLE;
 
-        power_ctrl.CW_enable  =                  (slave_06.CW_switch == 1) ? ENABLE : DISABLE;   //冷风开关打开
+        power_ctrl.CW_enable  =                  ((slave_06.sync_switch   == 0  ||    //同步关闭
+                                                   power_ctrl.signal_flag == 1) &&    //有24V信号进来
+                                                  (slave_06.CW_switch == 1))   //撒粉开关打开
+                                                  ? ENABLE : DISABLE;
 
         power_ctrl.AC2_enable =                  ((slave_06.sync_switch   == 0  ||    //同步关闭
                                                    Sensor_3 == 0) &&                  //有24V信号进来
                                                   (slave_06.MR_switch == 1))          //收料开关打开
-                                                  ? ENABLE : DISABLE;                                   
+                                                  ? ENABLE : DISABLE;                           
+        power_ctrl.IW1_enable =                 (slave_06.IW1_switch == 1) ? ENABLE : DISABLE;                              
     }else
     {
-        power_ctrl.AC1_enable = power_ctrl.DF_enable = power_ctrl.SF_enable = power_ctrl.CW_enable = power_ctrl.AC2_enable = 0;
+        power_ctrl.AC1_enable = power_ctrl.DF_enable = power_ctrl.SF_enable = 0;
+        power_ctrl.CW_enable = power_ctrl.AC2_enable = power_ctrl.IW1_enable = 0;
     }
 
     WK_220V  = (power_ctrl.AC1_enable == ENABLE) ? AC_ON  : AC_OFF;
     MR_220V  = (power_ctrl.AC2_enable == ENABLE) ? AC_ON  : AC_OFF;
     CW_24V   = (power_ctrl.CW_enable  == ENABLE) ? 1  : 0;
+    IW_1     = (power_ctrl.IW1_enable  == ENABLE) ? 1  : 0;
 }
 
 

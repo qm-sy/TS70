@@ -252,7 +252,6 @@ void Modbus_Fun6( void )
         case 0x06:
             slave_06.IW2_switch = modbus.byte_info_H;  
             slave_06.IW1_switch = modbus.byte_info_L;   
-            IW_ctrl();
             break;   
 
         /*  40008   冷风开关              */

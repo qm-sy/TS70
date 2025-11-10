@@ -66,7 +66,7 @@ void Modbus_Event_350P( void )
                 switch ( rs485_4.RX_buf[1] )
                 {
                     case FUN_03:            Modbus_Fun03_350P();            break; 
-
+                    case FUN_06:            Modbus_Fun06_350P();             break;  
                     default:                                                break;
                 }
             }
@@ -1124,9 +1124,16 @@ void Modbus_Fun03_350P( void )
     {
         sp350.params_get_flag1 = 0;
         sp350_parms_init();
+        Write_Dgusii_Vp_byChar(0x212a,"        ",8);
     }
-    
 }
+
+
+void Modbus_Fun06_350P( void )
+{
+    rs485_4.fun06_rcv_out = 1;
+}
+
 
 /**
  * @brief	Ð´µ¥¸öÊä³ö¼Ä´æÆ÷-06
@@ -1141,7 +1148,7 @@ void write_slave_06_350P(uint16_t reg_addr, uint8_t reg_val_H, uint8_t reg_val_L
     uint8_t send_buf[8];
     uint16_t crc;
 
-    delay_ms(10);
+    rs485_4.fun06_rcv_out = 0;
 
     send_buf[0] = SP350P_ADDR;       //Addr
     send_buf[1] = FUN_06;           //Fun

@@ -118,7 +118,7 @@ void Uart2_RXTX_Isr( void ) interrupt 4
             rs485_2.rcv_cnt++;
         }
         /* 6, 重置接收完毕判断时间                              */
-        rs485_2.rcv_timeout = 5;
+        rs485_2.rcv_timeout = 30;
     }
 
 }
@@ -180,7 +180,7 @@ void Uart4_RX_Isr() interrupt 11
             rs485_4.RX_rcv_cnt++;
         }
         /* 6, 重置接收完毕判断时间                              */
-        rs485_4.RX_rcv_timeout = 5;
+        rs485_4.RX_rcv_timeout = 30;
     }
 }
 
@@ -241,7 +241,7 @@ void Uart5_RX_Isr() interrupt 13
             rs485_5.RX_rcv_cnt++;
         }
         /* 6, 重置接收完毕判断时间                              */
-        rs485_5.RX_rcv_timeout = 5;
+        rs485_5.RX_rcv_timeout = 30;
     }
 }
 

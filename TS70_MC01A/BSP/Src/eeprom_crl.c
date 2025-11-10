@@ -91,7 +91,6 @@ void eeprom_data_init( void )
 
     slave_06.IW1_switch         = ISP_Read(IW1_SWITCH);
     slave_06.IW2_switch         = ISP_Read(IW2_SWITCH);
-    IW_ctrl();
 
     slave_06.CW_switch          = ISP_Read(CW_SWITCH);
 

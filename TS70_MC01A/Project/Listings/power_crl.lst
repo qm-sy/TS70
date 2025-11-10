@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.7.0   POWER_CRL                                                         11/07/2025 01:00:32 PAGE 1   
+C51 COMPILER V9.60.7.0   POWER_CRL                                                         11/10/2025 17:15:53 PAGE 1   
 
 
 C51 COMPILER V9.60.7.0, COMPILATION OF MODULE POWER_CRL
@@ -33,142 +33,120 @@ line level    source
   22   1      }
   23          
   24          /**
-  25           * @brief 吸风开关控制（继电器） x2
+  25           * @brief AC DC输出使能控制
   26           *
   27           * @param[in] 
   28           * 
   29           * @return  
   30           * 
   31          **/
-  32          void IW_ctrl( void )
+  32          void ac_dc_ctrl( void )
   33          {
-  34   1          if( slave_06.IW1_switch == 1 )
+  34   1          if( slave_06.power_switch == 1 )
   35   1          {
-  36   2              IW_1 = 1;
-  37   2          }else
-  38   1          {
-  39   2              IW_1 = 0;
-  40   2          }
-  41   1      
-  42   1          // if( slave_06.IW2_switch == 1 )
-  43   1          // {
-  44   1          //     IW_2 = 1;
-  45   1          // }else
-  46   1          // {
-  47   1          //     IW_2 = 0;
-  48   1          // }
-  49   1      }
-  50          
-  51          /**
-  52           * @brief AC DC输出使能控制
-  53           *
-C51 COMPILER V9.60.7.0   POWER_CRL                                                         11/07/2025 01:00:32 PAGE 2   
-
-  54           * @param[in] 
-  55           * 
-  56           * @return  
-  57           * 
-  58          **/
-  59          void ac_dc_ctrl( void )
-  60          {
-  61   1          if( slave_06.power_switch == 1 )
-  62   1          {
-  63   2              power_ctrl.AC1_enable = heat_enable_judge(temp.th_temp,              // 温度传感器1的当前�
+  36   2              power_ctrl.AC1_enable = heat_enable_judge(temp.th_temp,              // 温度传感器1的当前�
              -��
-  64   2                                                        slave_06.PostDry_temp,      // 通道1的加热目标温
+  37   2                                                        slave_06.PostDry_temp,      // 通道1的加热目标温
              -度
-  65   2                                                        slave_06.Insulation_temp     // 通道1的预加热温�
+  38   2                                                        slave_06.Insulation_temp     // 通道1的预加热温�
              -�
-  66   2                                                        ) ? ENABLE : DISABLE;         // 根据函数返回值�
+  39   2                                                        ) ? ENABLE : DISABLE;         // 根据函数返回值�
              -�置使能状态
-  67   2      
-  68   2              power_ctrl.DF_enable  =                  ((slave_06.sync_switch   == 0  ||    //同步关闭
-  69   2                                                         power_ctrl.signal_flag == 1) &&    //有24V信号进来
-  70   2                                                        (slave_06.DF_switch == 1))   //抖粉开关打开
-  71   2                                                        ? ENABLE : DISABLE;
-  72   2      
-  73   2              power_ctrl.SF_enable  =                  ((slave_06.sync_switch   == 0  ||    //同步关闭
-  74   2                                                         power_ctrl.signal_flag == 1) &&    //有24V信号进来
-  75   2                                                        (slave_06.SF_switch == 1))   //撒粉开关打开
-  76   2                                                        ? ENABLE : DISABLE;
-  77   2      
-  78   2              power_ctrl.CW_enable  =                  (slave_06.CW_switch == 1) ? ENABLE : DISABLE;   //冷风�
-             -��关打开
-  79   2      
-  80   2              power_ctrl.AC2_enable =                  ((slave_06.sync_switch   == 0  ||    //同步关闭
-  81   2                                                         Sensor_3 == 0) &&                  //有24V信号进来
-  82   2                                                        (slave_06.MR_switch == 1))          //收料开关打开
-  83   2                                                        ? ENABLE : DISABLE;                                   
-  84   2          }else
-  85   1          {
-  86   2              power_ctrl.AC1_enable = power_ctrl.DF_enable = power_ctrl.SF_enable = power_ctrl.CW_enable = power
-             -_ctrl.AC2_enable = 0;
-  87   2          }
-  88   1      
-  89   1          WK_220V  = (power_ctrl.AC1_enable == ENABLE) ? AC_ON  : AC_OFF;
-  90   1          MR_220V  = (power_ctrl.AC2_enable == ENABLE) ? AC_ON  : AC_OFF;
-  91   1          CW_24V   = (power_ctrl.CW_enable  == ENABLE) ? 1  : 0;
-  92   1      }
-  93          
-  94          
-  95          /**
-  96           * @brief AC输出使能判断
-  97           *
-  98           * @param[in] ntc_value,        当前温度值
-  99                        ntc_heat_temp,    加热目标温度  
- 100                        pre_temp,         预加热温度
- 101           * 
- 102           * @return  
- 103           * 
- 104          **/
- 105          uint8_t heat_enable_judge( uint8_t th_value, uint8_t th_heat_temp, uint8_t Insulation_temp )              
-             -   
- 106          {
- 107   1          // 第1层检查：后烘干开关  如果关闭，立即返回 0（不加热）
- 108   1          if( slave_06.PostDry_switch == 0 )
-C51 COMPILER V9.60.7.0   POWER_CRL                                                         11/07/2025 01:00:32 PAGE 3   
+  40   2      
+  41   2              power_ctrl.DF_enable  =                  ((slave_06.sync_switch   == 0  ||    //同步关闭
+  42   2                                                         power_ctrl.signal_flag == 1) &&    //有24V信号进来
+  43   2                                                        (slave_06.DF_switch == 1))   //抖粉开关打开
+  44   2                                                        ? ENABLE : DISABLE;
+  45   2      
+  46   2              power_ctrl.SF_enable  =                  ((slave_06.sync_switch   == 0  ||    //同步关闭
+  47   2                                                         power_ctrl.signal_flag == 1) &&    //有24V信号进来
+  48   2                                                        (slave_06.SF_switch == 1))   //撒粉开关打开
+  49   2                                                        ? ENABLE : DISABLE;
+C51 COMPILER V9.60.7.0   POWER_CRL                                                         11/10/2025 17:15:53 PAGE 2   
 
- 109   1          {
- 110   2              return DISABLE;
- 111   2          }
- 112   1      
- 113   1          // 第2层检查：加热需求
- 114   1          // 如果温度已经达到加热目标温度，立即返回 0（不加热）
- 115   1          if ( th_value >= th_heat_temp ) 
- 116   1          {
- 117   2              return DISABLE;
- 118   2          }
- 119   1          
- 120   1          // 第3层检查：工作模式
- 121   1          if ( slave_06.sync_switch == 1 ) 
- 122   1          {  
- 123   2              if ( power_ctrl.signal_flag == 0 )         // 同步模式且无信号时，只有在预加热状�
+  50   2      
+  51   2              power_ctrl.CW_enable  =                  ((slave_06.sync_switch   == 0  ||    //同步关闭
+  52   2                                                         power_ctrl.signal_flag == 1) &&    //有24V信号进来
+  53   2                                                        (slave_06.CW_switch == 1))   //撒粉开关打开
+  54   2                                                        ? ENABLE : DISABLE;
+  55   2      
+  56   2              power_ctrl.AC2_enable =                  ((slave_06.sync_switch   == 0  ||    //同步关闭
+  57   2                                                         Sensor_3 == 0) &&                  //有24V信号进来
+  58   2                                                        (slave_06.MR_switch == 1))          //收料开关打开
+  59   2                                                        ? ENABLE : DISABLE;                           
+  60   2              power_ctrl.IW1_enable =                 (slave_06.IW1_switch == 1) ? ENABLE : DISABLE;            
+             -                  
+  61   2          }else
+  62   1          {
+  63   2              power_ctrl.AC1_enable = power_ctrl.DF_enable = power_ctrl.SF_enable = 0;
+  64   2              power_ctrl.CW_enable = power_ctrl.AC2_enable = power_ctrl.IW1_enable = 0;
+  65   2          }
+  66   1      
+  67   1          WK_220V  = (power_ctrl.AC1_enable == ENABLE) ? AC_ON  : AC_OFF;
+  68   1          MR_220V  = (power_ctrl.AC2_enable == ENABLE) ? AC_ON  : AC_OFF;
+  69   1          CW_24V   = (power_ctrl.CW_enable  == ENABLE) ? 1  : 0;
+  70   1          IW_1     = (power_ctrl.IW1_enable  == ENABLE) ? 1  : 0;
+  71   1      }
+  72          
+  73          
+  74          /**
+  75           * @brief AC输出使能判断
+  76           *
+  77           * @param[in] ntc_value,        当前温度值
+  78                        ntc_heat_temp,    加热目标温度  
+  79                        pre_temp,         预加热温度
+  80           * 
+  81           * @return  
+  82           * 
+  83          **/
+  84          uint8_t heat_enable_judge( uint8_t th_value, uint8_t th_heat_temp, uint8_t Insulation_temp )              
+             -   
+  85          {
+  86   1          // 第1层检查：后烘干开关  如果关闭，立即返回 0（不加热）
+  87   1          if( slave_06.PostDry_switch == 0 )
+  88   1          {
+  89   2              return DISABLE;
+  90   2          }
+  91   1      
+  92   1          // 第2层检查：加热需求
+  93   1          // 如果温度已经达到加热目标温度，立即返回 0（不加热）
+  94   1          if ( th_value >= th_heat_temp ) 
+  95   1          {
+  96   2              return DISABLE;
+  97   2          }
+  98   1          
+  99   1          // 第3层检查：工作模式
+ 100   1          if ( slave_06.sync_switch == 1 ) 
+ 101   1          {  
+ 102   2              if ( power_ctrl.signal_flag == 0 )         // 同步模式且无信号时，只有在预加热状�
              -��下才允许加热
- 124   2              {
- 125   3                  // 在预加热状态下，只有温度低于预加热目标温度时才加热
- 126   3                  if( slave_06.Insulation_switch == 1 )
- 127   3                  {
- 128   4                      if( th_value < Insulation_temp )
- 129   4                      {
- 130   5                          return ENABLE;
- 131   5                      }else
- 132   4                      {
- 133   5                          return DISABLE;
- 134   5                      }
- 135   4                  }else
- 136   3                  {
- 137   4                      return DISABLE;
- 138   4                  }
- 139   3              }
- 140   2          }
- 141   1          
- 142   1          // 其他情况：允许加热
- 143   1          return ENABLE;
- 144   1      }
+ 103   2              {
+ 104   3                  // 在预加热状态下，只有温度低于预加热目标温度时才加热
+ 105   3                  if( slave_06.Insulation_switch == 1 )
+ 106   3                  {
+ 107   4                      if( th_value < Insulation_temp )
+ 108   4                      {
+C51 COMPILER V9.60.7.0   POWER_CRL                                                         11/10/2025 17:15:53 PAGE 3   
+
+ 109   5                          return ENABLE;
+ 110   5                      }else
+ 111   4                      {
+ 112   5                          return DISABLE;
+ 113   5                      }
+ 114   4                  }else
+ 115   3                  {
+ 116   4                      return DISABLE;
+ 117   4                  }
+ 118   3              }
+ 119   2          }
+ 120   1          
+ 121   1          // 其他情况：允许加热
+ 122   1          return ENABLE;
+ 123   1      }
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =    301    ----
+   CODE SIZE        =    336    ----
    CONSTANT SIZE    =   ----    ----
    XDATA SIZE       =     26    ----
    PDATA SIZE       =   ----    ----

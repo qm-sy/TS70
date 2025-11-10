@@ -53,6 +53,7 @@ void Modbus_Fun16_HanSen( void );
 
 void Modbus_Event_350P( void );
 void Modbus_Fun03_350P( void );
+void Modbus_Fun06_350P( void );
 void read_slave_03_350P( void );
 void write_slave_06_350P(uint16_t reg_addr, uint8_t reg_val_H, uint8_t reg_val_L);
 

@@ -30,6 +30,8 @@ void main()
 	rs485_2.fun04_rcv_out = 1;
 	rs485_2.press_flag1 = 0;
 	rs485_2.press_flag2 = 0;
+	rs485_4.fun06_rcv_out = 0;
+	rs485_4.comm_error_flag = 0;
 	delay_ms(200);
 
 	diwen_parms_init();
@@ -87,6 +89,13 @@ void main()
 			rs485_2.comm_error_flag = 0;
 			rs485_2.comm_error_flag2 = 1;
 			Write_Dgusii_Vp_byChar(0x211b,"通讯失败",8);
+		}
+		if(( rs485_4.comm_error_flag == 1 ) && ( sp350.params_get_flag1 == 0))
+		{
+			sp350.params_get_flag1 = 1;
+			sp350.params_get_flag2 = 1;
+			rs485_4.comm_error_flag = 0;
+			Write_Dgusii_Vp_byChar(0x212a,"通讯失败",8);
 		}
 	}
 }

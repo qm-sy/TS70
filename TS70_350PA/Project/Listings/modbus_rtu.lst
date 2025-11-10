@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.7.0   MODBUS_RTU                                                        10/21/2025 16:12:29 PAGE 1   
+C51 COMPILER V9.60.7.0   MODBUS_RTU                                                        11/10/2025 16:56:01 PAGE 1   
 
 
 C51 COMPILER V9.60.7.0, COMPILATION OF MODULE MODBUS_RTU
@@ -62,7 +62,7 @@ line level    source
   51   1      }
   52          
   53          /**
-C51 COMPILER V9.60.7.0   MODBUS_RTU                                                        10/21/2025 16:12:29 PAGE 2   
+C51 COMPILER V9.60.7.0   MODBUS_RTU                                                        11/10/2025 16:56:01 PAGE 2   
 
   54           * @brief 读输出寄存器  03
   55           *
@@ -126,7 +126,7 @@ line level    source
  113   3                  /*  40006  同步开关设置                         */
  114   3                  case 0X05:
  115   3                      modbus.byte_info_H = 0x00;   
-C51 COMPILER V9.60.7.0   MODBUS_RTU                                                        10/21/2025 16:12:29 PAGE 3   
+C51 COMPILER V9.60.7.0   MODBUS_RTU                                                        11/10/2025 16:56:01 PAGE 3   
 
  116   3                      modbus.byte_info_L = slave_06.R_alarm_val;    
  117   3      
@@ -190,7 +190,7 @@ line level    source
  175   2              {   
  176   3                  /*    30003 2路IR查询                         */
  177   3                  case 0:    
-C51 COMPILER V9.60.7.0   MODBUS_RTU                                                        10/21/2025 16:12:29 PAGE 4   
+C51 COMPILER V9.60.7.0   MODBUS_RTU                                                        11/10/2025 16:56:01 PAGE 4   
 
  178   3                      modbus.byte_info_H = slave_04.envir_humidity;
  179   3                      modbus.byte_info_L = slave_04.envir_temp;
@@ -238,7 +238,7 @@ line level    source
  221   2      
  222   2              /*  40004  烘干功率及风扇档位 设置              */
  223   2              case 0X03:
- 224   2                  slave_06.F_alarm_val   = rs485.RX2_buf[5];
+ 224   2                  slave_06.F_alarm_val = rs485.RX2_buf[5];
  225   2      
  226   2                  break;
  227   2      
@@ -254,7 +254,7 @@ line level    source
  237   2      
  238   2                  break;
  239   2      
-C51 COMPILER V9.60.7.0   MODBUS_RTU                                                        10/21/2025 16:12:29 PAGE 5   
+C51 COMPILER V9.60.7.0   MODBUS_RTU                                                        11/10/2025 16:56:01 PAGE 5   
 
  240   2              /*  40007  同步开关设置                         */
  241   2              case 0X06:
@@ -318,7 +318,7 @@ line level    source
  299   2                  
  300   2                  break;    
  301   2      
-C51 COMPILER V9.60.7.0   MODBUS_RTU                                                        10/21/2025 16:12:29 PAGE 6   
+C51 COMPILER V9.60.7.0   MODBUS_RTU                                                        11/10/2025 16:56:01 PAGE 6   
 
  302   2              case 0x06:
  303   2                  memcpy(rs485.TX2_buf,rs485.RX2_buf,8);
@@ -382,7 +382,7 @@ line level    source
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
    CODE SIZE        =    977    ----
-C51 COMPILER V9.60.7.0   MODBUS_RTU                                                        10/21/2025 16:12:29 PAGE 7   
+C51 COMPILER V9.60.7.0   MODBUS_RTU                                                        11/10/2025 16:56:01 PAGE 7   
 
    CONSTANT SIZE    =   ----    ----
    XDATA SIZE       =     18       6

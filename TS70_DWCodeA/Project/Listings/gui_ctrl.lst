@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.7.0   GUI_CTRL                                                          11/07/2025 00:56:35 PAGE 1   
+C51 COMPILER V9.60.7.0   GUI_CTRL                                                          11/10/2025 16:56:52 PAGE 1   
 
 
 C51 COMPILER V9.60.7.0, COMPILATION OF MODULE GUI_CTRL
@@ -62,7 +62,7 @@ line level    source
   51   1          hansen.addr_0x06 = 0x0149;
   52   1          hansen.addr_0x10 = 0x1f;
   53   1          hansen.addr_0x20 = 0x00;
-C51 COMPILER V9.60.7.0   GUI_CTRL                                                          11/07/2025 00:56:35 PAGE 2   
+C51 COMPILER V9.60.7.0   GUI_CTRL                                                          11/10/2025 16:56:52 PAGE 2   
 
   54   1          hansen.addr_0x21 = 0x00;
   55   1          hansen.addr_0x22 = 0x01;
@@ -126,7 +126,7 @@ line level    source
  113   2                  switch (val_L)
  114   2                  {
  115   3                      case 1: hansen.addr_0x06 |= 0x01;       break;
-C51 COMPILER V9.60.7.0   GUI_CTRL                                                          11/07/2025 00:56:35 PAGE 3   
+C51 COMPILER V9.60.7.0   GUI_CTRL                                                          11/10/2025 16:56:52 PAGE 3   
 
  116   3                      case 2: hansen.addr_0x06 |= 0x02;       break;
  117   3                      case 4: hansen.addr_0x06 |= 0x04;       break;
@@ -190,7 +190,7 @@ line level    source
  175   2                  break;
  176   2      
  177   2              case 0x2062:
-C51 COMPILER V9.60.7.0   GUI_CTRL                                                          11/07/2025 00:56:35 PAGE 4   
+C51 COMPILER V9.60.7.0   GUI_CTRL                                                          11/10/2025 16:56:52 PAGE 4   
 
  178   2                  hansen.addr_0x02 = (val_H << 8) |  val_L;
  179   2                  
@@ -254,7 +254,7 @@ line level    source
  237   3                  }
  238   2      
  239   2                  break;  
-C51 COMPILER V9.60.7.0   GUI_CTRL                                                          11/07/2025 00:56:35 PAGE 5   
+C51 COMPILER V9.60.7.0   GUI_CTRL                                                          11/10/2025 16:56:52 PAGE 5   
 
  240   2      
  241   2              case 0x20d8:
@@ -318,7 +318,7 @@ line level    source
  299   2                  break; 
  300   2      
  301   2              case 0x2018:
-C51 COMPILER V9.60.7.0   GUI_CTRL                                                          11/07/2025 00:56:35 PAGE 6   
+C51 COMPILER V9.60.7.0   GUI_CTRL                                                          11/10/2025 16:56:52 PAGE 6   
 
  302   2                  sp350.fan_switch = val_L;
  303   2                  write_slave_06_350P(FAN_SWITCH,0,sp350.fan_switch); 
@@ -382,7 +382,7 @@ line level    source
  361   2                  break;
  362   2      
  363   2              case 0x2118:
-C51 COMPILER V9.60.7.0   GUI_CTRL                                                          11/07/2025 00:56:35 PAGE 7   
+C51 COMPILER V9.60.7.0   GUI_CTRL                                                          11/10/2025 16:56:52 PAGE 7   
 
  364   2                  write_slave_06_DFG(0x0a,val_H,val_L);
  365   2                  break;

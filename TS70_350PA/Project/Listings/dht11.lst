@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.7.0   DHT11                                                             10/21/2025 16:12:29 PAGE 1   
+C51 COMPILER V9.60.7.0   DHT11                                                             11/10/2025 16:56:01 PAGE 1   
 
 
 C51 COMPILER V9.60.7.0, COMPILATION OF MODULE DHT11
@@ -62,7 +62,7 @@ line level    source
   49           **************************************************************************************/
   50          void Read_DHT11(void)   //温湿传感启动
   51          {
-C51 COMPILER V9.60.7.0   DHT11                                                             10/21/2025 16:12:29 PAGE 2   
+C51 COMPILER V9.60.7.0   DHT11                                                             11/10/2025 16:56:01 PAGE 2   
 
   52   1          uint8_t R_H,R_L,T_H,T_L,revise; 
   53   1      

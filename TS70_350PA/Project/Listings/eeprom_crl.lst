@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.7.0   EEPROM_CRL                                                        10/21/2025 16:12:29 PAGE 1   
+C51 COMPILER V9.60.7.0   EEPROM_CRL                                                        11/10/2025 16:56:01 PAGE 1   
 
 
 C51 COMPILER V9.60.7.0, COMPILATION OF MODULE EEPROM_CRL
@@ -62,7 +62,7 @@ line level    source
   51   1          ISP_Write(FAN_SWITCH,slave_06.fan_switch);
   52   1      
   53   1          ISP_Write(EEPROM_STATU_JUDGE,0x58);
-C51 COMPILER V9.60.7.0   EEPROM_CRL                                                        10/21/2025 16:12:29 PAGE 2   
+C51 COMPILER V9.60.7.0   EEPROM_CRL                                                        11/10/2025 16:56:01 PAGE 2   
 
   54   1      }
   55          

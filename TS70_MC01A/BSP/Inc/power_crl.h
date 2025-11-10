@@ -56,7 +56,6 @@ extern SLAVE_04 slave_04;
 extern POWER_CTRL power_ctrl;
 
 void temp_scan( void );
-void IW_ctrl( void );
 void ac_dc_ctrl( void );
 uint8_t heat_enable_judge( uint8_t th_value, uint8_t th_heat_temp, uint8_t Insulation_temp );
 

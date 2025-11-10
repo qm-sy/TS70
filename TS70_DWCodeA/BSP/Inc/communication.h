@@ -37,6 +37,8 @@ typedef struct
     uint8_t     TX_send_cnt;           //发送计数
     uint16_t    RX_rcv_timeout;        //接收超时
     uint8_t     RX_rcv_cnt;            //接收计数
+    uint8_t     fun06_rcv_out;
+    uint8_t     comm_error_flag;
 }RS485_4;
 
 typedef struct 
