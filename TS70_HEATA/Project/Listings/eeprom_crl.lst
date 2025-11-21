@@ -1,0 +1,115 @@
+C51 COMPILER V9.60.7.0   EEPROM_CRL                                                        11/21/2025 17:16:31 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE EEPROM_CRL
+OBJECT MODULE PLACED IN ..\Output\eeprom_crl.obj
+COMPILER INVOKED BY: D:\APP\KEIL\MDK\C51\BIN\C51.EXE ..\BSP\Src\eeprom_crl.c LARGE OPTIMIZE(8,SPEED) BROWSE INCDIR(..\BS
+                    -P\Inc;..\Core\Inc;..\Driver;..\Emembed\Inc;..\SYSTEM\Inc) DEBUG OBJECTEXTEND PRINT(.\Listings\eeprom_crl.lst) TABS(2) OB
+                    -JECT(..\Output\eeprom_crl.obj)
+
+line level    source
+
+   1          #include "eeprom_crl.h"
+   2          
+   3          /**
+   4           * @brief eeprom状态判定，是否写入过
+   5           *
+   6           * @param   
+   7           *
+   8           * @return  void
+   9          **/
+  10          void eeprom_statu_judge( void )
+  11          {
+  12   1          uint8_t eeprom_statu_flag;
+  13   1      
+  14   1          eeprom_statu_flag = ISP_Read(EEPROM_STATU_JUDGE);
+  15   1      
+  16   1          if( eeprom_statu_flag != 0x58 )
+  17   1          {
+  18   2              slave_06.F_HeatTemp     = 80;
+  19   2              slave_06.F_HeatSwitch   = 1;
+  20   2              slave_06.M_HeatTemp     = 80;
+  21   2              slave_06.M_HeatSwitch   = 1;
+  22   2              slave_06.R_HeatTemp     = 80;
+  23   2              slave_06.R_HeatSwitch   = 1;                     
+  24   2              slave_06.SF_level       = 3;  
+  25   2              slave_06.SF_Switch      = 1;
+  26   2              slave_06.HF_Direction   = 0;           
+  27   2              slave_06.HF_level       = 3;  
+  28   2              slave_06.HF_Switch      = 1;
+  29   2              eeprom_data_record(); 
+  30   2          }
+  31   1          eeprom_data_init();    
+  32   1      }
+  33          
+  34          /**
+  35           * @brief 主机更改参数后写入
+  36           *
+  37           * @param   
+  38           *
+  39           * @return  void
+  40          **/
+  41          void eeprom_data_record( void )
+  42          {
+  43   1          ISP_Earse(0x0000);
+  44   1      
+  45   1          ISP_Write(F_HEAT_TEMP,slave_06.F_HeatTemp);
+  46   1          ISP_Write(F_HEAT_SWITCH,slave_06.F_HeatSwitch);
+  47   1          ISP_Write(M_HEAT_TEMP,slave_06.M_HeatTemp);
+  48   1          ISP_Write(M_HEAT_SWITCH,slave_06.M_HeatSwitch);
+  49   1          ISP_Write(R_HEAT_TEMP,slave_06.R_HeatTemp);
+  50   1          ISP_Write(R_HEAT_SWITCH,slave_06.R_HeatSwitch);
+  51   1          ISP_Write(SF_LEVEL,slave_06.SF_level);
+  52   1          ISP_Write(SF_SWITCH,slave_06.SF_Switch);
+  53   1          ISP_Write(HF_DIRECTION,slave_06.HF_Direction);
+C51 COMPILER V9.60.7.0   EEPROM_CRL                                                        11/21/2025 17:16:31 PAGE 2   
+
+  54   1          ISP_Write(HF_LEVEL,slave_06.HF_level);        
+  55   1          ISP_Write(HF_SWITCH,slave_06.HF_Switch); 
+  56   1      
+  57   1          ISP_Write(EEPROM_STATU_JUDGE,0x58);
+  58   1      
+  59   1          delay_ms(10);
+  60   1      }
+  61          
+  62          
+  63          /**
+  64           * @brief eeprom 数据初始化
+  65           *
+  66           * @param   
+  67           *
+  68           * @return  void
+  69          **/
+  70          void eeprom_data_init( void )
+  71          {
+  72   1          slave_06.F_HeatTemp     = ISP_Read(F_HEAT_TEMP);
+  73   1          slave_06.F_HeatSwitch   = ISP_Read(F_HEAT_SWITCH);
+  74   1          slave_06.M_HeatTemp     = ISP_Read(M_HEAT_TEMP);
+  75   1          slave_06.M_HeatSwitch   = ISP_Read(M_HEAT_SWITCH);
+  76   1          slave_06.R_HeatTemp     = ISP_Read(R_HEAT_TEMP);
+  77   1          slave_06.R_HeatSwitch   = ISP_Read(R_HEAT_SWITCH);
+  78   1          slave_06.SF_level       = ISP_Read(SF_LEVEL);
+  79   1          slave_06.SF_Switch      = ISP_Read(SF_SWITCH);
+  80   1          slave_06.HF_Direction   = ISP_Read(HF_DIRECTION);
+  81   1          slave_06.HF_level       = ISP_Read(HF_LEVEL);
+  82   1          slave_06.HF_Switch      = ISP_Read(HF_SWITCH);
+  83   1      
+  84   1          slave_06.sync_switch    = 0;           
+  85   1          slave_06.sync_signal    = 0;  
+  86   1          slave_06.signal_back    = 0;  
+  87   1      }
+  88          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    359    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

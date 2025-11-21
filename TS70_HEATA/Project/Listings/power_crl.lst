@@ -1,0 +1,266 @@
+C51 COMPILER V9.60.7.0   POWER_CRL                                                         11/21/2025 17:16:31 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE POWER_CRL
+OBJECT MODULE PLACED IN ..\Output\power_crl.obj
+COMPILER INVOKED BY: D:\APP\KEIL\MDK\C51\BIN\C51.EXE ..\BSP\Src\power_crl.c LARGE OPTIMIZE(8,SPEED) BROWSE INCDIR(..\BSP
+                    -\Inc;..\Core\Inc;..\Driver;..\Emembed\Inc;..\SYSTEM\Inc) DEBUG OBJECTEXTEND PRINT(.\Listings\power_crl.lst) TABS(2) OBJE
+                    -CT(..\Output\power_crl.obj)
+
+line level    source
+
+   1          #include "power_crl.h"
+   2          
+   3          SLAVE_06 slave_06;
+   4          POWER_CTRL power_ctrl;
+   5          
+   6          
+   7          void Power_Init( void )
+   8          {
+   9   1          /*  开机状态置一                */
+  10   1          power_ctrl.power_switch = 1;
+  11   1      
+  12   1          AC_Out1 = AC_Out2 = AC_Out3 = AC_OFF;
+  13   1      
+  14   1          Buzzer = BUZZER_OFF;
+  15   1          slave_06.sync_signal_turndown = 0;
+  16   1          slave_06.sync_switch_delay = 0;
+  17   1      }
+  18          
+  19          /**
+  20           * @brief 温度扫描，DHT11温湿度扫描 1s/次 控制220V输出使能
+  21           *
+  22           * @param[in] 
+  23           * 
+  24           * @return  
+  25           * 
+  26          **/
+  27          void temp_scan( void )
+  28          {
+  29   1          uint16_t *temp_val = NULL;
+  30   1      
+  31   1          if( temp.scan_flag == 1 )
+  32   1          {
+  33   2              temp_val = max6675_readTemp();
+  34   2      
+  35   2              temp.thermo1_temp = temp_val[0];
+  36   2              temp.thermo2_temp = temp_val[1];
+  37   2              temp.thermo3_temp = temp_val[2];
+  38   2      
+  39   2              temp.scan_flag = 0;
+  40   2          }
+  41   1      }
+  42          
+  43          /**
+  44           * @brief AC DC输出使能控制
+  45           *
+  46           * @param[in] 
+  47           * 
+  48           * @return  
+  49           * 
+  50          **/
+  51          void ac_dc_ctrl( void )
+  52          {
+  53   1          if( power_ctrl.power_switch == 1 )
+C51 COMPILER V9.60.7.0   POWER_CRL                                                         11/21/2025 17:16:31 PAGE 2   
+
+  54   1          {
+  55   2              power_ctrl.AC1_enable = heat_enable_judge(slave_06.F_HeatSwitch,
+  56   2                                                        temp.thermo1_temp,            // 温度传感器1的当�
+             -��值
+  57   2                                                        slave_06.F_HeatTemp           // 通道F的加热目标�
+             -��度
+  58   2                                                        ) ? ENABLE : DISABLE;         // 根据函数返回值�
+             -�置使能状态
+  59   2      
+  60   2              power_ctrl.AC2_enable = heat_enable_judge(slave_06.M_HeatSwitch,
+  61   2                                                        temp.thermo2_temp,            // 温度传感器2的当�
+             -��值
+  62   2                                                        slave_06.M_HeatTemp           // 通道M的加热目标�
+             -��度
+  63   2                                                        ) ? ENABLE : DISABLE;         // 根据函数返回值�
+             -�置使能状态
+  64   2      
+  65   2              power_ctrl.AC3_enable = heat_enable_judge(slave_06.R_HeatSwitch,
+  66   2                                                        temp.thermo3_temp,            // 温度传感器3的当�
+             -��值
+  67   2                                                        slave_06.R_HeatTemp          // 通道R的加热目标�
+             -�度
+  68   2                                                        ) ? ENABLE : DISABLE;         // 根据函数返回值�
+             -�置使能状态
+  69   2      
+  70   2              power_ctrl.FanTemp_enable = ENABLE;
+  71   2      
+  72   2              motor_enable_judge();
+  73   2          }else
+  74   1          {
+  75   2              power_ctrl.AC1_enable = power_ctrl.AC2_enable = power_ctrl.AC3_enable = DISABLE;
+  76   2              power_ctrl.FanTemp_enable = DISABLE;
+  77   2              PWMB_ENO = 0;
+  78   2          }
+  79   1          
+  80   1          AC_Out1  = (power_ctrl.AC1_enable == ENABLE) ? AC_ON  : AC_OFF;
+  81   1          AC_Out2  = (power_ctrl.AC2_enable == ENABLE) ? AC_ON  : AC_OFF;
+  82   1          AC_Out3  = (power_ctrl.AC3_enable == ENABLE) ? AC_ON  : AC_OFF;
+  83   1          Fan_Temp = (power_ctrl.FanTemp_enable == ENABLE) ? FAN_ON  : FAN_OFF;
+  84   1          PWMB_CCR5 = 183 * slave_06.SF_level;
+  85   1          PWMB_CCR6 = PWMB_CCR7 = 183 * slave_06.HF_level;
+  86   1      }
+  87          
+  88          
+  89          /**
+  90           * @brief AC输出使能判断
+  91           *
+  92           * @param[in] ntc_value,        当前温度值
+  93                        ntc_heat_temp,    加热目标温度  
+  94                        pre_temp,         预加热温度
+  95           * 
+  96           * @return  
+  97           * 
+  98          **/
+  99          uint8_t heat_enable_judge(uint8_t CH_switch, uint8_t TherMo_value, uint8_t CH_heat_temp)                 
+ 100          {
+ 101   1          // 第1层检查：加热开关
+ 102   1          if( CH_switch == 0 )
+ 103   1          {
+ 104   2              return DISABLE;
+ 105   2          }
+ 106   1          
+C51 COMPILER V9.60.7.0   POWER_CRL                                                         11/21/2025 17:16:31 PAGE 3   
+
+ 107   1          // 第2层检查：加热需求
+ 108   1          // 如果温度已经达到加热目标温度，立即返回 0（不加热）
+ 109   1          if ( TherMo_value >= CH_heat_temp ) 
+ 110   1          {
+ 111   2              return DISABLE;
+ 112   2          }
+ 113   1          
+ 114   1          // 第3层检查：工作模式  同步模式下，无同步信号则不进行加热
+ 115   1          if ( slave_06.sync_switch == SW_OPEN ) 
+ 116   1          {  
+ 117   2              if ( slave_06.sync_signal == 0 )         
+ 118   2              {
+ 119   3                 return DISABLE;
+ 120   3              }
+ 121   2          }
+ 122   1          
+ 123   1          // 其他情况：允许加热
+ 124   1          return ENABLE;
+ 125   1      }
+ 126          
+ 127          void motor_enable_judge( void )
+ 128          {
+ 129   1          sync_signal_listen();
+ 130   1          sync_switch_listen();
+ 131   1      
+ 132   1          if( slave_06.sync_switch == 0 )
+ 133   1          {
+ 134   2              motor_state_set();
+ 135   2          }else
+ 136   1          {
+ 137   2              if( slave_06.sync_signal == 0 )
+ 138   2              {
+ 139   3                  if( slave_06.sync_signal_turndown == 1 )
+ 140   3                  {
+ 141   4                      PWMB_ENO &= 0xeb;
+ 142   4                  }else
+ 143   3                  {
+ 144   4                      PWMB_ENO = 0;
+ 145   4                  }
+ 146   3              }
+ 147   2          }
+ 148   1      }
+ 149          
+ 150          void motor_state_set( void )
+ 151          {
+ 152   1          if( slave_06.sync_switch_delay == 0 )
+ 153   1          {
+ 154   2              if (slave_06.SF_Switch == 1) 
+ 155   2              {
+ 156   3                  PWMB_ENO = (slave_06.HF_Switch == 1) ? 
+ 157   3                          (slave_06.HF_Direction == 1 ? 0x11 : 0x05) : 0x01;
+ 158   3              }else 
+ 159   2              {
+ 160   3                  PWMB_ENO = (slave_06.HF_Switch == 1) ? 
+ 161   3                          (slave_06.HF_Direction == 1 ? 0x10 : 0x04) : 0x00;
+ 162   3              }
+ 163   2          }else
+ 164   1          {
+ 165   2              PWMB_ENO = 0;
+ 166   2          }
+ 167   1      
+ 168   1      }
+C51 COMPILER V9.60.7.0   POWER_CRL                                                         11/21/2025 17:16:31 PAGE 4   
+
+ 169          
+ 170          /**
+ 171           * @brief 同步信号监听 同时满足有同步且同步信号从1↓0时触发风扇延时输出
+ 172           *
+ 173           * @param   
+ 174           *
+ 175           * @return  void
+ 176          **/
+ 177          void sync_signal_listen( void )
+ 178          {
+ 179   1          static uint8_t signal_flag = 0;
+ 180   1      
+ 181   1          if( signal_flag != slave_06.sync_signal )
+ 182   1          {
+ 183   2              signal_flag = slave_06.sync_signal;
+ 184   2      
+ 185   2              if( slave_06.sync_switch == 1 )     //同步模式下
+ 186   2              {
+ 187   3                  if( signal_flag == 0 )          //同步信号 1 →→ 0  J1延时
+ 188   3                  {
+ 189   4                      slave_06.sync_signal_turndown = 1;
+ 190   4                  }else                           //同步信号 0 →→ 1  J2J3复位
+ 191   3                  {
+ 192   4                      slave_06.hf_reset_flag = 1;
+ 193   4                  }
+ 194   3              }
+ 195   2          }
+ 196   1      }
+ 197          
+ 198          /**
+ 199           * @brief 同步信号监听 同时满足有同步且同步信号从1↓0时触发风扇延时输出
+ 200           *
+ 201           * @param   
+ 202           *
+ 203           * @return  void
+ 204          **/
+ 205          void sync_switch_listen( void )
+ 206          {
+ 207   1          static uint8_t switch_flag = 0;
+ 208   1      
+ 209   1          if( switch_flag != slave_06.sync_switch )
+ 210   1          {
+ 211   2              switch_flag = slave_06.sync_switch;
+ 212   2      
+ 213   2              if(( switch_flag == 1 ) && ( slave_06.sync_signal == 1 ))       //手动 →→ 自动 且有同�
+             -�信号J2J3复位
+ 214   2              {
+ 215   3                  slave_06.hf_reset_flag = 1;
+ 216   3              }
+ 217   2      
+ 218   2              if( switch_flag == 0 )
+ 219   2              {
+ 220   3                  slave_06.sync_switch_delay = 1;
+ 221   3              }
+ 222   2          }
+ 223   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    548    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =     29    ----
+C51 COMPILER V9.60.7.0   POWER_CRL                                                         11/21/2025 17:16:31 PAGE 5   
+
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

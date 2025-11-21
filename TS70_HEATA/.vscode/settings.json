@@ -1,0 +1,10 @@
+{
+    "files.associations": {
+        "communication.h": "c",
+        "gpio.h": "c",
+        "sys.h": "c",
+        "modbus_rtu.h": "c",
+        "eeprom_crl.h": "c",
+        "tim.h": "c"
+    }
+}

@@ -1,0 +1,100 @@
+C51 COMPILER V9.60.7.0   COMMON                                                            11/21/2025 17:16:31 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE COMMON
+OBJECT MODULE PLACED IN ..\Output\common.obj
+COMPILER INVOKED BY: D:\APP\KEIL\MDK\C51\BIN\C51.EXE ..\Emembed\Src\common.c LARGE OPTIMIZE(8,SPEED) BROWSE INCDIR(..\BS
+                    -P\Inc;..\Core\Inc;..\Driver;..\Emembed\Inc;..\SYSTEM\Inc) DEBUG OBJECTEXTEND PRINT(.\Listings\common.lst) TABS(2) OBJECT
+                    -(..\Output\common.obj)
+
+line level    source
+
+   1          #include "common.h"
+   2          
+   3          /**
+   4           * @brief 一些定时执行的事件   Timer3：10ms
+   5           *
+   6           * @param   
+   7           *
+   8           * @return  void
+   9          **/
+  10          void Tim3_ISR( void ) interrupt 19
+  11          {
+  12   1          static uint16_t temp_scan_cnt = 0;
+  13   1          static uint16_t sync_signal_cnt  = 0;
+  14   1          static uint16_t sync_switch_cnt  = 0;
+  15   1          static uint16_t sync_delay_cnt  = 0;
+  16   1          /* 1, temp 上报 1s/次           */
+  17   1          if( temp.scan_flag == 0 )
+  18   1          {
+  19   2              temp_scan_cnt++;
+  20   2              if( temp_scan_cnt == 100 )
+  21   2              {
+  22   3                  temp_scan_cnt  = 0;
+  23   3                  temp.scan_flag = 1;
+  24   3              }
+  25   2          }
+  26   1          if( slave_06.sync_signal_turndown == 1 )
+  27   1          {
+  28   2              sync_signal_cnt++;
+  29   2              if( sync_signal_cnt == 500 )
+  30   2              {
+  31   3                  slave_06.sync_signal_turndown = 0;
+  32   3                  sync_signal_cnt = 0;
+  33   3                  PWMB_ENO &= 0xfe;
+  34   3              }
+  35   2          }
+  36   1      
+  37   1          if(( slave_06.hf_reset_flag == 1 ) && ( slave_06.HF_Switch == 1 )) 
+  38   1          {
+  39   2              sync_switch_cnt++;
+  40   2              if( sync_switch_cnt == 1 )      
+  41   2              {
+  42   3                  PWMB_ENO &= 0x01;           //J2 J3停止
+  43   3              }
+  44   2              if( sync_switch_cnt == 100 )    //停止1s 100-1
+  45   2              {
+  46   3                  PWMB_ENO |= 0x04;           //J2运行    
+  47   3              }   
+  48   2              if( sync_switch_cnt == 400 )    //J2运行3s 400-100
+  49   2              {
+  50   3                  PWMB_ENO &= 0xfb;           //J2 J3停止
+  51   3              }
+  52   2              if( sync_switch_cnt == 500 )    //停止1s  500-400
+  53   2              {
+C51 COMPILER V9.60.7.0   COMMON                                                            11/21/2025 17:16:31 PAGE 2   
+
+  54   3                  PWMB_ENO |= 0x10;           //J3运行    
+  55   3                  slave_06.hf_reset_flag = 0;
+  56   3                  sync_switch_cnt = 0;
+  57   3              }
+  58   2              if( slave_06.SF_Switch == 1 )
+  59   2              {
+  60   3                  PWMB_ENO |= 0X01;
+  61   3              }
+  62   2          }
+  63   1      
+  64   1          if( slave_06.sync_switch_delay == 1 )
+  65   1          {
+  66   2              sync_delay_cnt++;
+  67   2              if( sync_delay_cnt == 100 )
+  68   2              {
+  69   3                  slave_06.sync_switch_delay = 0;
+  70   3                  sync_delay_cnt = 0;
+  71   3              }
+  72   2          }
+  73   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    291    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =      8    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

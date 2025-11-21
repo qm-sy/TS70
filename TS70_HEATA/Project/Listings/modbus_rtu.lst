@@ -1,0 +1,482 @@
+C51 COMPILER V9.60.7.0   MODBUS_RTU                                                        11/21/2025 17:16:31 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE MODBUS_RTU
+OBJECT MODULE PLACED IN ..\Output\modbus_rtu.obj
+COMPILER INVOKED BY: D:\APP\KEIL\MDK\C51\BIN\C51.EXE ..\Emembed\Src\modbus_rtu.c LARGE OPTIMIZE(8,SPEED) BROWSE INCDIR(.
+                    -.\BSP\Inc;..\Core\Inc;..\Driver;..\Emembed\Inc;..\SYSTEM\Inc) DEBUG OBJECTEXTEND PRINT(.\Listings\modbus_rtu.lst) TABS(2
+                    -) OBJECT(..\Output\modbus_rtu.obj)
+
+line level    source
+
+   1          #include "modbus_rtu.h"
+   2          
+   3          MODBIS_INFO modbus;
+   4          
+   5          /**
+   6           * @brief modbus_rtu  无奇偶校验
+   7           *
+   8           * @param   void
+   9           *
+  10           * @return  void 
+  11          **/
+  12          void Modbus_Event( void )
+  13          {
+  14   1          uint16_t crc,rccrc;
+  15   1          
+  16   1          /*1.接收完毕                                           */
+  17   1          if( rs485.rcv_end_Flag == 1 )
+  18   1          {
+  19   2      
+  20   2              /*2.CRC校验                                         */
+  21   2              crc = MODBUS_CRC16(rs485.rcv_buf, rs485.rcv_cnt-2);
+  22   2              rccrc = (rs485.rcv_buf[rs485.rcv_cnt - 1]) | (rs485.rcv_buf[rs485.rcv_cnt -2 ] << 8);
+  23   2      
+  24   2              /*3.CRC校验通过，进行地址域校验                      */
+  25   2              if( crc == rccrc )
+  26   2              {
+  27   3                  /*3-1.地址域校验通过，进入相应功能函数进行处理      */
+  28   3                  if( rs485.rcv_buf[0] == MY_ADDR )
+  29   3                  {
+  30   4                      switch ( rs485.rcv_buf[1] )
+  31   4                      {
+  32   5                          case FUN_03:      Modbus_Fun3();          break;
+  33   5                          case FUN_04:      Modbus_Fun4();          break;
+  34   5                          case FUN_06:      Modbus_Fun6();          break;
+  35   5                          case FUN_16:      Modbus_Fun16();         break;
+  36   5      
+  37   5                          default:                                  break;
+  38   5                      }
+  39   4                  }
+  40   3              }
+  41   2              /*4.清空接收完毕标志位  清空接收计数        */    
+  42   2              rs485.rcv_end_Flag = 0;
+  43   2              rs485.rcv_cnt = 0; 
+  44   2          }
+  45   1      }
+  46          
+  47          /**
+  48           * @brief 读输入寄存器  03
+  49           *
+  50           * @param   void
+  51           *
+  52           * @return  void 
+  53          **/
+C51 COMPILER V9.60.7.0   MODBUS_RTU                                                        11/21/2025 17:16:31 PAGE 2   
+
+  54          void Modbus_Fun3( void )
+  55          {
+  56   1          uint16_t i;
+  57   1      
+  58   1          modbus.rcv_addr1_valH  = 3;                //DATA1 H 位置
+  59   1          modbus.start_reg_03    = rs485.rcv_buf[2] << 8 | rs485.rcv_buf[3];
+  60   1          modbus.reg_num_03      = rs485.rcv_buf[4] << 8 | rs485.rcv_buf[5];
+  61   1      
+  62   1          rs485.send_buf[0]  = MY_ADDR;                  //Addr
+  63   1          rs485.send_buf[1]  = FUN_03;                   //Fun
+  64   1          rs485.send_buf[2]  = modbus.reg_num_03 * 2;    //Byte Count
+  65   1      
+  66   1          for( i = modbus.start_reg_03; i < modbus.start_reg_03 + modbus.reg_num_03; i++ )
+  67   1          {
+  68   2              switch (i)
+  69   2              {               
+  70   3                  /*  40001 前烘干停止温度                    */
+  71   3                  case 0x00:
+  72   3                      modbus.byte_info_H  = 0x00;
+  73   3                      modbus.byte_info_L  = slave_06.F_HeatTemp;
+  74   3                      break;
+  75   3      
+  76   3                  /*  40002 前烘干开关                    */
+  77   3                  case 0x01:
+  78   3                      modbus.byte_info_H  = 0x00;
+  79   3                      modbus.byte_info_L  = slave_06.F_HeatSwitch;
+  80   3                      break;
+  81   3      
+  82   3                  /*  40003 中烘干停止温度                    */
+  83   3                  case 0x02:
+  84   3                      modbus.byte_info_H  = 0x00;
+  85   3                      modbus.byte_info_L  = slave_06.M_HeatTemp;
+  86   3                      break;
+  87   3      
+  88   3                  /*  40004 中烘干开关                    */
+  89   3                  case 0x03:
+  90   3                      modbus.byte_info_H  = 0x00;
+  91   3                      modbus.byte_info_L  = slave_06.M_HeatSwitch;
+  92   3                      break;
+  93   3      
+  94   3                  /*  40005 后加热停止温度                     */    
+  95   3                  case 0x04:
+  96   3                      modbus.byte_info_H  = 0x00;
+  97   3                      modbus.byte_info_L  = slave_06.R_HeatTemp;
+  98   3                      break;
+  99   3      
+ 100   3                  /*  40006 后加热开关                     */    
+ 101   3                  case 0x05:
+ 102   3                      modbus.byte_info_H  = 0x00;
+ 103   3                      modbus.byte_info_L  = slave_06.R_HeatSwitch;
+ 104   3                      break;
+ 105   3      
+ 106   3                  /*  40007 撒粉电机转速                 */
+ 107   3                  case 0x06:   
+ 108   3                      modbus.byte_info_H  = 0x00;
+ 109   3                      modbus.byte_info_L  = slave_06.SF_level;
+ 110   3                      break;
+ 111   3      
+ 112   3                  /*  40008 撒粉电机开关                 */
+ 113   3                  case 0x07:   
+ 114   3                      modbus.byte_info_H  = 0x00;
+ 115   3                      modbus.byte_info_L  = slave_06.SF_Switch;
+C51 COMPILER V9.60.7.0   MODBUS_RTU                                                        11/21/2025 17:16:31 PAGE 3   
+
+ 116   3                      break;    
+ 117   3      
+ 118   3                  /*  40009 回粉电机方向                */
+ 119   3                  case 0x08:   
+ 120   3                      modbus.byte_info_H  = 0x00;
+ 121   3                      modbus.byte_info_L  = slave_06.HF_Direction;
+ 122   3                      break;
+ 123   3      
+ 124   3                  /*  40010 回粉电机转速                */
+ 125   3                  case 0x09:   
+ 126   3                      modbus.byte_info_H  = 0x00;
+ 127   3                      modbus.byte_info_L  = slave_06.HF_level;
+ 128   3                      break;
+ 129   3      
+ 130   3                  /*  40011 回粉电机转速                */
+ 131   3                  case 0x0a:   
+ 132   3                      modbus.byte_info_H  = 0x00;
+ 133   3                      modbus.byte_info_L  = slave_06.HF_Switch;
+ 134   3                      break;
+ 135   3      
+ 136   3                  default:
+ 137   3                      modbus.byte_info_H = 0x00;
+ 138   3                      modbus.byte_info_L = 0x00;
+ 139   3                      break;
+ 140   3              }
+ 141   2              rs485.send_buf[modbus.rcv_addr1_valH++] = modbus.byte_info_H;
+ 142   2              rs485.send_buf[modbus.rcv_addr1_valH++] = modbus.byte_info_L;
+ 143   2          }
+ 144   1          slave_to_master(FUN_03,3 + modbus.reg_num_03 * 2);
+ 145   1      }
+ 146          
+ 147          /**
+ 148           * @brief 读输出寄存器  04
+ 149           *
+ 150           * @param   void
+ 151           *
+ 152           * @return  void 
+ 153          **/
+ 154          void Modbus_Fun4( void )
+ 155          {
+ 156   1          uint16_t i;
+ 157   1      
+ 158   1          modbus.rcv_addr1_valH  = 3;                 //DATA1 H 位置
+ 159   1          modbus.start_reg_04 = rs485.rcv_buf[2] << 8 | rs485.rcv_buf[3];
+ 160   1          modbus.reg_num_04   = rs485.rcv_buf[4] << 8 | rs485.rcv_buf[5];
+ 161   1      
+ 162   1          rs485.send_buf[0]  = MY_ADDR;                  //Addr
+ 163   1          rs485.send_buf[1]  = FUN_04;                   //Fun
+ 164   1          rs485.send_buf[2]  = modbus.reg_num_04 * 2;    //Byte Count
+ 165   1      
+ 166   1          for( i = modbus.start_reg_04; i < modbus.start_reg_04 + modbus.reg_num_04; i++ )
+ 167   1          {
+ 168   2              switch (i)
+ 169   2              {
+ 170   3                  /*  30001  thermopile1温度                        */
+ 171   3                  case 0x00:
+ 172   3                      modbus.byte_info_H = temp.thermo1_temp >> 8;
+ 173   3                      modbus.byte_info_L = temp.thermo1_temp;
+ 174   3                      break;
+ 175   3      
+ 176   3                  /*  30002  thermopile2温度                        */
+ 177   3                  case 0x01:
+C51 COMPILER V9.60.7.0   MODBUS_RTU                                                        11/21/2025 17:16:31 PAGE 4   
+
+ 178   3                      modbus.byte_info_H = temp.thermo2_temp >> 8;
+ 179   3                      modbus.byte_info_L = temp.thermo2_temp;
+ 180   3                      break;
+ 181   3      
+ 182   3                  /*  30003  thermopile3温度                        */
+ 183   3                  case 0x02:
+ 184   3                      modbus.byte_info_H = temp.thermo3_temp >> 8;
+ 185   3                      modbus.byte_info_L = temp.thermo3_temp;
+ 186   3                      break;
+ 187   3      
+ 188   3                  default:
+ 189   3                      modbus.byte_info_H = 0X00;
+ 190   3                      modbus.byte_info_L = 0X00;
+ 191   3                      break;
+ 192   3              }
+ 193   2              rs485.send_buf[modbus.rcv_addr1_valH++] = modbus.byte_info_H;
+ 194   2              rs485.send_buf[modbus.rcv_addr1_valH++] = modbus.byte_info_L;
+ 195   2          }
+ 196   1          slave_to_master(FUN_04,3 + modbus.reg_num_04 * 2);
+ 197   1      }
+ 198          
+ 199          /**
+ 200           * @brief 写单个输出寄存器  06
+ 201           *
+ 202           * @param   void
+ 203           *
+ 204           * @return  void 
+ 205          **/
+ 206          void Modbus_Fun6( void )
+ 207          {
+ 208   1          modbus.reg_addr_06 = rs485.rcv_buf[2] << 8 | rs485.rcv_buf[3];
+ 209   1          modbus.byte_info_H = rs485.rcv_buf[4];
+ 210   1          modbus.byte_info_L = rs485.rcv_buf[5];
+ 211   1      
+ 212   1          switch (rs485.rcv_buf[3])
+ 213   1          {
+ 214   2              /*  40001 前烘干停止温度                    */
+ 215   2              case 0x00:
+ 216   2                  slave_06.F_HeatTemp = modbus.byte_info_L;
+ 217   2                  break;
+ 218   2      
+ 219   2              /*  40002 前烘干开关                    */
+ 220   2              case 0x01:
+ 221   2                  slave_06.F_HeatSwitch = modbus.byte_info_L;
+ 222   2                  break;
+ 223   2      
+ 224   2              /*  40003 中烘干停止温度                    */
+ 225   2              case 0x02:
+ 226   2                  slave_06.M_HeatTemp = modbus.byte_info_L;
+ 227   2                  break;
+ 228   2      
+ 229   2              /*  40004 中烘干开关                    */
+ 230   2              case 0x03:
+ 231   2                  slave_06.M_HeatSwitch = modbus.byte_info_L;
+ 232   2                  break;
+ 233   2      
+ 234   2              /*  40005 后加热停止温度                     */    
+ 235   2              case 0x04:
+ 236   2                  slave_06.R_HeatTemp = modbus.byte_info_L;
+ 237   2                  break;
+ 238   2      
+ 239   2              /*  40006 后加热开关                     */    
+C51 COMPILER V9.60.7.0   MODBUS_RTU                                                        11/21/2025 17:16:31 PAGE 5   
+
+ 240   2              case 0x05:
+ 241   2                  slave_06.R_HeatSwitch = modbus.byte_info_L;
+ 242   2                  break;
+ 243   2      
+ 244   2              /*  40007 撒粉电机转速                 */
+ 245   2              case 0x06:   
+ 246   2                  slave_06.SF_level = modbus.byte_info_L;
+ 247   2                  break;
+ 248   2      
+ 249   2              /*  40008 撒粉电机开关                 */
+ 250   2              case 0x07:   
+ 251   2                  slave_06.SF_Switch = modbus.byte_info_L;
+ 252   2                  break;    
+ 253   2      
+ 254   2              /*  40009 回粉电机方向                */
+ 255   2              case 0x08:   
+ 256   2                  slave_06.HF_Direction = modbus.byte_info_L;
+ 257   2                  break;
+ 258   2      
+ 259   2              /*  40010 回粉电机转速                */
+ 260   2              case 0x09:   
+ 261   2                  slave_06.HF_level = modbus.byte_info_L;
+ 262   2                  break;
+ 263   2      
+ 264   2              /*  40011 回粉电机开关                */
+ 265   2              case 0x0a:   
+ 266   2                  slave_06.HF_Switch = modbus.byte_info_L;
+ 267   2                  break;
+ 268   2      
+ 269   2              /*  40012 同步开关              */
+ 270   2              case 0x0b:                                         
+ 271   2                  slave_06.sync_switch = modbus.byte_info_L;
+ 272   2                  break;
+ 273   2      
+ 274   2              /*  40013 同步开关信号             */
+ 275   2              case 0x0c:                                             
+ 276   2                  slave_06.sync_signal = modbus.byte_info_L;
+ 277   2                  break;
+ 278   2      
+ 279   2              /*  40014 回到原点信号              */
+ 280   2              case 0x0d:                                         
+ 281   2                  slave_06.signal_back = modbus.byte_info_L;
+ 282   2                  break;
+ 283   2      
+ 284   2              /*  40015 总电源开关             */
+ 285   2              case 0x0e:                                             
+ 286   2                  power_ctrl.power_switch = modbus.byte_info_L;
+ 287   2                  break;
+ 288   2      
+ 289   2              default:
+ 290   2                  break;   
+ 291   2          }
+ 292   1      
+ 293   1          slave_to_master(FUN_06,8);
+ 294   1      
+ 295   1          eeprom_data_record();
+ 296   1      }
+ 297          
+ 298          /**
+ 299           * @brief 写多个输出寄存器  16
+ 300           *
+ 301           * @param   void
+C51 COMPILER V9.60.7.0   MODBUS_RTU                                                        11/21/2025 17:16:31 PAGE 6   
+
+ 302           *
+ 303           * @return  void 
+ 304          **/
+ 305          void Modbus_Fun16( void )
+ 306          {
+ 307   1          uint16_t i;
+ 308   1      
+ 309   1          modbus.rcv_addr1_valH = 7;                  //DATA1 H位置
+ 310   1          modbus.start_reg_16 = rs485.rcv_buf[2] << 8 | rs485.rcv_buf[3];
+ 311   1          modbus.reg_num_16   = rs485.rcv_buf[4] << 8 | rs485.rcv_buf[5];
+ 312   1      
+ 313   1      
+ 314   1          for( i = modbus.rcv_addr1_valH; i < modbus.rcv_addr1_valH + modbus.reg_num_16; i++)
+ 315   1          {
+ 316   2              modbus.byte_info_H = rs485.rcv_buf[modbus.rcv_addr1_valH];
+ 317   2              modbus.byte_info_L = rs485.rcv_buf[modbus.rcv_addr1_valH + 1];
+ 318   2              switch (i)
+ 319   2              {
+ 320   3                  /*  40012 同步开关              */
+ 321   3                  case 0x0b:                                         
+ 322   3                      slave_06.sync_switch = modbus.byte_info_L;
+ 323   3                      break;
+ 324   3      
+ 325   3                  /*  40013 同步开关信号             */
+ 326   3                  case 0x0c:                                             
+ 327   3                      slave_06.sync_signal = modbus.byte_info_L;
+ 328   3                      break;
+ 329   3      
+ 330   3                  /*  40014 回到原点信号              */
+ 331   3                  case 0x0d:                                         
+ 332   3                      slave_06.signal_back = modbus.byte_info_L;
+ 333   3                      break;
+ 334   3      
+ 335   3                      default:
+ 336   3                          break;
+ 337   3              }
+ 338   2              modbus.rcv_addr1_valH += 2;         //从Value1_H →→ 从Value2_H
+ 339   2          }
+ 340   1      
+ 341   1          slave_to_master(FUN_16,8);
+ 342   1      }
+ 343          
+ 344          /**
+ 345           * @brief 从机回复主机
+ 346           *  
+ 347           * @param   code_num:功能码       
+ 348           * @param   length:数据长度        
+ 349           * 
+ 350            @return  crc16:crc校验的值 2byte
+ 351           */
+ 352          void slave_to_master( uint8_t code_num, uint8_t length )
+ 353          {
+ 354   1          uint16_t crc;
+ 355   1      
+ 356   1          switch (code_num)
+ 357   1          {
+ 358   2              case FUN_03:
+ 359   2                  crc = MODBUS_CRC16(rs485.send_buf,length);
+ 360   2      
+ 361   2                  rs485.send_buf[length+1] = crc;             //CRC H
+ 362   2                  rs485.send_buf[length]   = crc >> 8;        //CRC L
+ 363   2      
+C51 COMPILER V9.60.7.0   MODBUS_RTU                                                        11/21/2025 17:16:31 PAGE 7   
+
+ 364   2                  rs485.send_bytelength = length + 2;
+ 365   2                  break;
+ 366   2      
+ 367   2              case FUN_04:
+ 368   2                  crc = MODBUS_CRC16(rs485.send_buf,length);
+ 369   2      
+ 370   2                  rs485.send_buf[length+1] = crc;              //CRC H
+ 371   2                  rs485.send_buf[length]   = crc >> 8;         //CRC L
+ 372   2      
+ 373   2                  rs485.send_bytelength = length + 2;
+ 374   2                  break;    
+ 375   2      
+ 376   2              case FUN_06:
+ 377   2                  memcpy(rs485.send_buf,rs485.rcv_buf,8);
+ 378   2      
+ 379   2                  rs485.send_bytelength = length;
+ 380   2                  break;    
+ 381   2      
+ 382   2              case FUN_16:
+ 383   2                  memcpy(rs485.send_buf,rs485.rcv_buf,6);
+ 384   2              
+ 385   2                  crc = MODBUS_CRC16(rs485.send_buf,6);
+ 386   2      
+ 387   2                  rs485.send_buf[7] = crc;                 //CRC H
+ 388   2                  rs485.send_buf[6] = crc >> 8;            //CRC L
+ 389   2              
+ 390   2                  rs485.send_bytelength = length;
+ 391   2                  break; 
+ 392   2      
+ 393   2              default:
+ 394   2                  break;
+ 395   2          }
+ 396   1      
+ 397   1          DR_485 = 1;                                 //485可以发送
+ 398   1          S4CON |= S4TI;                              //开始发送
+ 399   1          delay_ms(2);
+ 400   1      }
+ 401          
+ 402          
+ 403          /**
+ 404           * @brief crc校验函数
+ 405           * 
+ 406           * @param   buf：  Address(1 byte) +Funtion(1 byte) ）+Data(n byte)   
+ 407           * @param   length:数据长度           
+ 408           * 
+ 409            @return  crc16:crc校验的值 2byte
+ 410           */
+ 411          uint16_t MODBUS_CRC16(uint8_t *buf, uint8_t length)
+ 412          {
+ 413   1        uint8_t i;
+ 414   1        uint16_t  crc16;
+ 415   1      
+ 416   1          /* 1, 预置16位CRC寄存器为0xffff（即全为1）                          */
+ 417   1        crc16 = 0xffff; 
+ 418   1      
+ 419   1        do
+ 420   1        {
+ 421   2              /* 2, 把8位数据与16位CRC寄存器的低位相异或，把结果放于CRC寄存器     */    
+             -    
+ 422   2          crc16 ^= (uint16_t)*buf;    //
+ 423   2          for(i=0; i<8; i++)    
+ 424   2          {
+C51 COMPILER V9.60.7.0   MODBUS_RTU                                                        11/21/2025 17:16:31 PAGE 8   
+
+ 425   3                  /* 3, 如果最低位为1，把CRC寄存器的内容右移一位(朝低位)，用0填补最高
+             -位 再异或0xA001    */
+ 426   3            if(crc16 & 1)
+ 427   3                  {
+ 428   4                      crc16 = (crc16 >> 1) ^ 0xA001;
+ 429   4                  }
+ 430   3                  /* 4, 如果最低位为0，把CRC寄存器的内容右移一位(朝低位)，用0填补最高
+             -位                */
+ 431   3                  else
+ 432   3                  {
+ 433   4                      crc16 >>= 1;
+ 434   4                  }   
+ 435   3          }
+ 436   2          buf++;
+ 437   2        }while(--length != 0);
+ 438   1      
+ 439   1        return  (crc16);
+ 440   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   1388    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =     17       6
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
